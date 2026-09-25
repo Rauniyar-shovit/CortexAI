@@ -26,7 +26,7 @@ app.use(
 
 app.use(cookieParser());
 
-app.use("/auth", proxy(env.AUTH_SERVICE));
+app.use("/api/auth", proxy(env.AUTH_SERVICE));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
