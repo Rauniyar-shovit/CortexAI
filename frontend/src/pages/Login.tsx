@@ -5,6 +5,9 @@ import api from "../utils/axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import getCurrentUser from "../features/getCurrentUser";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../redux/store";
+import { setUserData } from "../redux/userSlice";
 
 const MODES = [
   { name: "Chat", hue: 350 },
@@ -37,16 +40,24 @@ const inputClass =
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    getCurrentUser().then((user) => {
-      if (user) navigate("/home", { replace: true });
-    });
-  }, [navigate]);
+    const getUser = async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        dispatch(setUserData(user));
+        navigate("/home", { replace: true });
+      }
+    };
+    getUser();
+  }, [dispatch, navigate]);
 
   const handleLogin = async (token: string) => {
     try {
       await api.post("/api/auth/login", { token });
+      const user = await getCurrentUser();
+      dispatch(setUserData(user));
       navigate("/home", { replace: true });
     } catch (error) {
       console.log(error);
@@ -56,7 +67,6 @@ const Login = () => {
   const googleLogin = async () => {
     const data = await signInWithPopup(auth, googleProvider);
     const token = await data.user.getIdToken();
-    console.log(token);
 
     await handleLogin(token);
 

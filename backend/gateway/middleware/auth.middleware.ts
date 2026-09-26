@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import redis from "../../../shared/redis/redis.ts";
+import redis from "../../shared/redis/redis.ts";
 
 const protect = async (req: Request, res: Response, next: NextFunction) => {
   try {

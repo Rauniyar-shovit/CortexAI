@@ -62,11 +62,3 @@ export const logOut = async (req: Request, res: Response) => {
     return res.status(500).json({ message: `logout error ${error}` });
   }
 };
-
-export const getCurrentUser = async (req: Request, res: Response) => {
-  try {
-    return res.status(200).json(req.user);
-  } catch (error) {
-    return res.status(500).json({ message: `get current user error ${error}` });
-  }
-};

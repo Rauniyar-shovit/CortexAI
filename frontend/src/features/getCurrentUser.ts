@@ -9,9 +9,10 @@ export type CurrentUser = {
 
 const getCurrentUser = async (): Promise<CurrentUser | null> => {
   try {
-    const { data } = await api.get<CurrentUser>("/api/auth/getCurrentUser");
+    const { data } = await api.get<CurrentUser>("/api/getCurrentUser");
     return data;
-  } catch {
+  } catch (error) {
+    console.log(error);
     return null;
   }
 };

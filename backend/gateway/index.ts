@@ -1,15 +1,18 @@
-import dotenv from "dotenv";
-
+import "dotenv/config";
 import cors from "cors";
 import proxy from "express-http-proxy";
 import cookieParser from "cookie-parser";
 import express, { type Express, type Request, type Response } from "express";
 import { cleanEnv, port, str } from "envalid";
-dotenv.config();
+import protect from "./middleware/auth.middleware.ts";
+import { getCurrentUser } from "./controllers/user.controller.ts";
+import { proxyWithHeader } from "./utils/proxyWithHeader.ts";
 
 const env = cleanEnv(process.env, {
   PORT: port(),
   AUTH_SERVICE: str(),
+  CHAT_SERVICE: str(),
+  AGENT_SERVICE: str(),
   FRONTEND_URL: str(),
 });
 
@@ -27,10 +30,9 @@ app.use(
 app.use(cookieParser());
 
 app.use("/api/auth", proxy(env.AUTH_SERVICE));
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
-});
+app.use("/api/chat", protect, proxyWithHeader(env.CHAT_SERVICE));
+app.use("/api/agent", protect, proxy(env.AGENT_SERVICE));
+app.get("/api/getCurrentUser", protect, getCurrentUser);
 
 app.get("/", (req, res) => {
   res.json({ message: "hello from gateway" });

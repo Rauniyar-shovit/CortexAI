@@ -11,8 +11,6 @@ function ProtectedRoute() {
     const getUser = async () => {
       const user = await getCurrentUser();
       user ? setStatus("authenticated") : setStatus("unauthenticated");
-
-      console.log(user);
     };
     getUser();
   }, []);
