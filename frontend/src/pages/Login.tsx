@@ -6,7 +6,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import getCurrentUser from "../features/getCurrentUser";
 import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../redux/store";
 import { setUserData } from "../redux/userSlice";
 
 const MODES = [
@@ -40,7 +39,7 @@ const inputClass =
 
 const Login = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const getUser = async () => {

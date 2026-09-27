@@ -1,11 +1,5 @@
+import type { CurrentUser } from "../types/conversation";
 import api from "../utils/axios";
-
-export type CurrentUser = {
-  userId: string;
-  name: string;
-  email: string;
-  avatar?: string;
-};
 
 const getCurrentUser = async (): Promise<CurrentUser | null> => {
   try {

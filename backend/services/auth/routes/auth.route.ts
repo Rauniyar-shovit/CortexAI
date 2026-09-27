@@ -4,5 +4,5 @@ import { login, logOut } from "../controllers/auth.controllers.ts";
 const router = express.Router();
 
 router.post("/login", login);
-router.post("/logout", logOut);
+router.get("/logout", logOut);
 export default router;
