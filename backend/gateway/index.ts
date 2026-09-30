@@ -7,6 +7,7 @@ import { cleanEnv, port, str } from "envalid";
 import protect from "./middleware/auth.middleware.ts";
 import { getCurrentUser } from "./controllers/user.controller.ts";
 import { proxyWithHeader } from "./utils/proxyWithHeader.ts";
+import morgan from "morgan";
 
 const env = cleanEnv(process.env, {
   PORT: port(),
@@ -28,7 +29,7 @@ app.use(
 );
 
 app.use(cookieParser());
-
+app.use(morgan("dev"));
 app.use("/api/auth", proxy(env.AUTH_SERVICE));
 app.use("/api/chat", protect, proxyWithHeader(env.CHAT_SERVICE));
 app.use("/api/agent", protect, proxy(env.AGENT_SERVICE));
