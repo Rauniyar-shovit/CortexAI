@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { CurrentUser } from "../types/conversation";
+import type { CurrentUser } from "../types/types";
 
 type UserState = {
   userData: CurrentUser | null;

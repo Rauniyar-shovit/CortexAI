@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Conversation } from "../types/conversation";
+import type { Message } from "../types/types";
 
 type MessageState = {
-  messages: Conversation[] | null;
+  messages: Message[] | null;
 };
 const initialState: MessageState = {
   messages: [],
@@ -12,11 +12,15 @@ const messageSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
-    setMessages: (state, action: PayloadAction<Conversation[] | null>) => {
+    setMessages: (state, action: PayloadAction<Message[] | null>) => {
       state.messages = action.payload;
+    },
+
+    addMessage: (state, action: PayloadAction<Message>) => {
+      state.messages?.push(action.payload);
     },
   },
 });
 
-export const { setMessages } = messageSlice.actions;
+export const { setMessages, addMessage } = messageSlice.actions;
 export default messageSlice.reducer;

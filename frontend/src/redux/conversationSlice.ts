@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Conversation } from "../types/conversation";
+import type { Conversation } from "../types/types";
 
 type ConversationState = {
   conversations: Conversation[] | null;

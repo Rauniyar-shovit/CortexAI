@@ -9,7 +9,7 @@ const env = cleanEnv(process.env, {
 
 const groq = new ChatGroq({
   apiKey: env.GROQ_API_KEY,
-  model: "llama-3.3-70b-versatile",
+  model: "openai/gpt-oss-120b",
 });
 
 const gemini = new ChatGoogleGenerativeAI({

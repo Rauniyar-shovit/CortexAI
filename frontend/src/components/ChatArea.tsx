@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import ChatNavbar from "./ChatNavbar";
 import MessageList from "./MessageList";
-import WelcomeScreen from "./WelcomeScreen";
+import ChatInput from "./ChatInput";
 import type { RootState } from "../redux/store";
 import { useEffect } from "react";
 import getMessages from "../features/getMessages";
@@ -28,6 +28,7 @@ const ChatArea = () => {
     <div className="flex min-h-0 flex-1 flex-col gap-3.5">
       <ChatNavbar />
       <MessageList />
+      <ChatInput />
     </div>
   );
 };

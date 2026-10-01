@@ -1,4 +1,4 @@
-import type { CurrentUser } from "../types/conversation";
+import type { CurrentUser } from "../types/types";
 import api from "../utils/axios";
 
 const getCurrentUser = async (): Promise<CurrentUser | null> => {

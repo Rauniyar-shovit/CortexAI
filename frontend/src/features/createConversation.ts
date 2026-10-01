@@ -1,5 +1,5 @@
 import api from "../utils/axios";
-import type { Conversation } from "../types/conversation";
+import type { Conversation } from "../types/types";
 
 const createConversation = async (): Promise<Conversation | null> => {
   try {
