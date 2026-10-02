@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   addConversation,
   setConversations,
-  setSelectConversations,
+  setSelectedConversation,
 } from "../redux/conversationSlice";
 import createConversation from "../features/createConversation";
 import type { RootState } from "../redux/store";
@@ -116,7 +116,7 @@ const Sidebar = () => {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            handleCreateConverstion();
+            dispatch(setSelectedConversation(null));
           }}
           aria-label="New chat"
           title="New chat"
@@ -201,7 +201,10 @@ const Sidebar = () => {
         <button
           type="button"
           className="flex cursor-pointer items-center justify-center gap-1 rounded-2xl bg-sf p-3 text-[15px] font-bold text-ink shadow-soft transition hover:bg-sf2"
-          onClick={handleCreateConverstion}
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(setSelectedConversation(null));
+          }}
         >
           <Plus size={18} />
           New chat
@@ -233,7 +236,7 @@ const Sidebar = () => {
                     key={conv._id}
                     type="button"
                     title={conv.title}
-                    onClick={() => dispatch(setSelectConversations(conv))}
+                    onClick={() => dispatch(setSelectedConversation(conv))}
                     className={`cursor-pointer truncate rounded-xl px-3 py-2.5 text-left text-sm text-ink transition-colors ${
                       isActive ? "bg-sf font-bold" : "hover:bg-sf/60"
                     }`}

@@ -9,7 +9,7 @@ const env = cleanEnv(process.env, {
 
 export const agent = async (req: Request, res: Response) => {
   try {
-    const { prompt, conversationId } = req.body;
+    const { prompt, conversationId, agent } = req.body;
 
     await axios.post(`${env.CHAT_SERVICE}/save-message`, {
       content: prompt,
@@ -20,6 +20,7 @@ export const agent = async (req: Request, res: Response) => {
     const result = await graph.invoke({
       prompt,
       conversationId,
+      agent,
     });
 
     const response = result.aiResponse;

@@ -1,6 +1,13 @@
 import { Annotation } from "@langchain/langgraph";
 
-export type AgentName = "search" | "chat" | "coding" | "vision" | "pdf" | "ppt";
+export type AgentName =
+  | "search"
+  | "chat"
+  | "coding"
+  | "vision"
+  | "pdf"
+  | "ppt"
+  | "auto";
 
 export const agentState = Annotation.Root({
   prompt: Annotation<string>(),

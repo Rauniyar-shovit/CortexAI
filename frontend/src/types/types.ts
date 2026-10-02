@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 // Shape of a Conversation document as returned by the chat service (JSON-serialized).
 export type Conversation = {
   _id: string;
@@ -26,4 +28,20 @@ export type Message = {
   content: string;
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type AgentId =
+  | "auto"
+  | "chat"
+  | "coding"
+  | "pdf"
+  | "ppt"
+  | "image"
+  | "search";
+
+export type Agent = {
+  id: AgentId;
+  label: string;
+  icon: LucideIcon;
+  hue: number;
 };

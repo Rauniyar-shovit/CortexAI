@@ -4,41 +4,63 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import sendMessage from "../features/sendMessage";
 import { addMessage } from "../redux/messageSlice";
+import createConversation from "../features/createConversation";
+import {
+  addConversation,
+  setConvTitle,
+  setSelectedConversation,
+} from "../redux/conversationSlice";
+import updateConversation from "../features/updateConversation";
+import { agents } from "../constants";
+import type { Agent, AgentId } from "../types/types";
 
 // Mode dot hues from the design: oklch(0.84 0.08 <hue>)
-const MODES = [
-  { name: "Auto", hue: 290 },
-  { name: "Chat", hue: 350 },
-  { name: "Coding", hue: 40 },
-  { name: "PDF", hue: 310 },
-  { name: "PPT", hue: 130 },
-  { name: "Image", hue: 250 },
-  { name: "Search", hue: 90 },
-];
 
 type ChatInputProps = {
   placeholder?: string;
-  activeMode?: string;
 };
 
 // Design only — no send, mode switching, attach or voice behaviour yet.
-const ChatInput = ({
-  placeholder = "Ask Onyx anything…",
-  activeMode = "Auto",
-}: ChatInputProps) => {
+const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => {
   const [value, setValue] = useState<string>("");
   const { selectedConversation } = useSelector(
     (state: RootState) => state?.conversation,
   );
+
+  const [selectedAgent, setSelectedAgent] = useState<AgentId>("auto");
 
   const dispatch = useDispatch();
 
   const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    let conversation = selectedConversation;
+
+    if (!conversation) {
+      const conv = await createConversation();
+      dispatch(setSelectedConversation(conv));
+      dispatch(addConversation(conv));
+      conversation = conv;
+    }
+
+    if (conversation?.title === "New Chat") {
+      await updateConversation({
+        id: conversation._id,
+        title: value.trim(),
+      });
+
+      dispatch(
+        setConvTitle({
+          conversationId: conversation._id,
+          title: value.slice(0, 40),
+        }),
+      );
+    }
+
     const payload = {
       prompt: value,
-      conversationId: selectedConversation?._id,
+      conversationId: conversation?._id,
+      agent: selectedAgent,
     };
 
     dispatch(addMessage({ role: "user", content: value.trim() }));
@@ -55,28 +77,30 @@ const ChatInput = ({
         onSubmit={handleSendMessage}
         className="flex flex-col gap-2.5 rounded-[26px] bg-sf p-3.5 shadow-composer"
       >
-        {/* Mode pills */}
+        {/* agents pills */}
         <div className="flex flex-wrap gap-1.5">
-          {MODES.map((mode) => {
-            const active = mode.name === activeMode;
+          {agents.map((agent) => {
+            const active = agent.id === selectedAgent;
+            const Icon = agent.icon;
             return (
               <button
-                key={mode.name}
+                onClick={() => setSelectedAgent(agent.id)}
+                key={agent.id}
                 type="button"
                 aria-pressed={active}
                 className={`flex cursor-pointer items-center gap-1.75 rounded-full px-3.25 py-1.75 text-[13px] font-bold transition-colors ${
                   active ? "bg-ac text-aci" : "bg-sf2 text-ink hover:bg-ac/40"
                 }`}
               >
-                <span
-                  className="size-2 rounded-full"
+                <Icon
+                  size={14}
                   style={{
-                    background: active
+                    color: active
                       ? "var(--aci)"
-                      : `oklch(0.84 0.08 ${mode.hue})`,
+                      : `oklch(0.84 0.08 ${agent.hue})`,
                   }}
                 />
-                {mode.name}
+                {agent.label}
               </button>
             );
           })}
