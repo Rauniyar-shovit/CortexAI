@@ -12,7 +12,7 @@ import {
 } from "../redux/conversationSlice";
 import updateConversation from "../features/updateConversation";
 import { agents } from "../constants";
-import type { Agent, AgentId } from "../types/types";
+import type { AgentId } from "../types/types";
 
 // Mode dot hues from the design: oklch(0.84 0.08 <hue>)
 
@@ -66,9 +66,17 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
     dispatch(addMessage({ role: "user", content: value.trim() }));
 
     setValue("");
-    const data = await sendMessage(payload);
 
-    dispatch(addMessage({ role: "assistant", content: data }));
+    const data = await sendMessage(payload);
+    if (!data) return;
+
+    dispatch(
+      addMessage({
+        role: "assistant",
+        content: data.answer,
+        images: data.images,
+      }),
+    );
   };
 
   return (

@@ -28,12 +28,13 @@ const MessageList = () => {
       {messages?.length === 0 || !selectedConversation ? (
         <NewConversationText />
       ) : (
-        <div className="mx-auto flex w-full max-w-190 flex-col gap-4.5 pb-4">
+        <div className="mx-auto flex w-full max-w-190 flex-col gap-7 pb-4">
           {messages?.map((message, index) => (
             <MessageBubble
               key={index}
               role={message.role}
               content={message.content}
+              images={message.images}
             />
           ))}
         </div>

@@ -14,7 +14,22 @@ export const chatAgent = async (state: AgentState) => {
 
   const history = await getMemory(state.conversationId);
 
+  const searchContext = state.searchResults
+    ? `Web Search Results: 
+  
+  ${JSON.stringify(state.searchResults)}
+  
+  Answer the user using only the above search results.
+  `
+    : "";
+
   const systemPrompt = `Your are OnyxAI, an intelligent AI assistant 
+
+  ${searchContext}
+
+    if searchContext exists:
+    - Use search results to answer. 
+    - Do not mention internal tools
 
   Rules:
 - For simple questions, greetings, and short queries, respond naturally in plain
@@ -34,6 +49,8 @@ export const chatAgent = async (state: AgentState) => {
   const messages: BaseMessage[] = [new SystemMessage(systemPrompt)];
 
   history?.forEach((msg: Message) => {
+    // Skip malformed entries (e.g. cached with undefined content)
+    if (typeof msg?.content !== "string" || !msg.content) return;
     if (msg.role === "user") {
       messages.push(new HumanMessage(msg.content));
     }

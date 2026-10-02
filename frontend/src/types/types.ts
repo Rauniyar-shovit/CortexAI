@@ -26,6 +26,8 @@ export type Message = {
   conversationId?: string;
   role: MessageRole;
   content: string;
+  // Objects from a live agent response; plain URLs once persisted by the chat service.
+  images?: string[];
   createdAt?: string;
   updatedAt?: string;
 };

@@ -25,18 +25,25 @@ export const agent = async (req: Request, res: Response) => {
 
     const response = result.aiResponse;
 
-    console.log("ai response:", response);
+    if (typeof response !== "string" || !response) {
+      return res
+        .status(501)
+        .json({ message: `agent "${result.agent}" did not return a response` });
+    }
     await addMessage(conversationId, "user", prompt);
 
     await addMessage(conversationId, "assistant", response);
+
+    const images = result.images?.map((image) => image.url) ?? [];
 
     await axios.post(`${env.CHAT_SERVICE}/save-message`, {
       content: response,
       conversationId,
       role: "assistant",
+      images,
     });
 
-    return res.status(200).json(response);
+    return res.status(200).json({ answer: response, images });
   } catch (error) {
     return res.status(500).json({ message: `agent error ${error}` });
   }
