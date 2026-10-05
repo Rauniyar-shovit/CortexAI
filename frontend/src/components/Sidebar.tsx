@@ -16,6 +16,7 @@ import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/firebase";
 import logOut from "../features/logout";
+import { setArtifacts } from "../redux/messageSlice";
 
 // Placeholder credits — replace with real data from the backend.
 const CREDITS = { left: 42, total: 100, resetsInDays: 6 };
@@ -117,6 +118,7 @@ const Sidebar = () => {
           onClick={(e) => {
             e.stopPropagation();
             dispatch(setSelectedConversation(null));
+            dispatch(setArtifacts([]));
           }}
           aria-label="New chat"
           title="New chat"
@@ -204,6 +206,7 @@ const Sidebar = () => {
           onClick={(e) => {
             e.stopPropagation();
             dispatch(setSelectedConversation(null));
+            dispatch(setArtifacts([]));
           }}
         >
           <Plus size={18} />

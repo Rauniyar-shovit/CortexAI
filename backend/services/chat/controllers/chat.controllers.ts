@@ -37,13 +37,14 @@ export const getConversations = async (req: Request, res: Response) => {
 
 export const saveMessage = async (req: Request, res: Response) => {
   try {
-    const { conversationId, role, content, images } = req.body;
+    const { conversationId, role, content, images, artifacts } = req.body;
 
     const message = await Message.create({
       conversationId,
       role,
       content,
       images,
+      artifacts,
     });
 
     return res.status(200).json(message);

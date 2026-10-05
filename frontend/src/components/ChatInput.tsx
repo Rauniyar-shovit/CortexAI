@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import sendMessage from "../features/sendMessage";
-import { addMessage } from "../redux/messageSlice";
+import { addMessage, setArtifacts } from "../redux/messageSlice";
 import createConversation from "../features/createConversation";
 import {
   addConversation,
@@ -68,6 +68,7 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
     setValue("");
 
     const data = await sendMessage(payload);
+
     if (!data) return;
 
     dispatch(
@@ -75,8 +76,14 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
         role: "assistant",
         content: data.answer,
         images: data.images,
+        artifacts: data.artifacts,
       }),
     );
+
+    // Only replies that produce artifacts touch the panel; plain replies leave it as it is.
+    if (data.artifacts?.length) {
+      dispatch(setArtifacts(data.artifacts));
+    }
   };
 
   return (

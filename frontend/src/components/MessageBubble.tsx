@@ -1,8 +1,51 @@
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { CodeXml, X } from "lucide-react";
+import { motion } from "motion/react";
+import { useDispatch, useSelector } from "react-redux";
 import Logo from "./Logo";
 import MarkdownContent from "./MarkdownContent";
-import type { Message } from "../types/types";
+import { setArtifacts } from "../redux/messageSlice";
+import type { RootState } from "../redux/store";
+import type { Artifact, Message } from "../types/types";
+
+type ArtifactCardProps = {
+  artifact: Artifact;
+  active: boolean;
+  onOpen: () => void;
+};
+
+// Artifact card from the design: opens (or focuses) the artifact panel.
+const ArtifactCard = ({ artifact, active, onOpen }: ArtifactCardProps) => {
+  const fileCount = artifact.files?.length ?? 0;
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onOpen}
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.98 }}
+      aria-pressed={active}
+      className={`flex w-full max-w-105 cursor-pointer items-center gap-3 rounded-[18px] bg-sf p-3 text-left whitespace-normal ring-2 transition-shadow ${
+        active ? "ring-ac" : "ring-transparent hover:ring-ln"
+      }`}
+    >
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-ac3 text-aci">
+        <CodeXml size={20} />
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate text-[15px] font-bold text-ink capitalize">
+          {artifact.title}
+        </span>
+        <span className="truncate text-[13px] text-mu">
+          {artifact.type} · {fileCount} {fileCount === 1 ? "file" : "files"}
+        </span>
+      </span>
+      <span className="ml-auto shrink-0 rounded-full bg-ac px-2.5 py-1 text-xs font-bold text-aci">
+        {active ? "Viewing" : "Open"}
+      </span>
+    </motion.button>
+  );
+};
 
 type LightboxImageProps = {
   url: string;
@@ -47,9 +90,13 @@ const LightboxImage = ({ url, onClose }: LightboxImageProps) => {
   );
 };
 
-const MessageBubble = ({ role, content, images }: Message) => {
+const MessageBubble = ({ role, content, images, artifacts }: Message) => {
   const isUser = role === "user";
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const dispatch = useDispatch();
+  const { artifacts: shownArtifacts, isArtifactOpen } = useSelector(
+    (state: RootState) => state.message,
+  );
 
   if (isUser) {
     return (
@@ -87,6 +134,18 @@ const MessageBubble = ({ role, content, images }: Message) => {
         )}
 
         <MarkdownContent content={content} />
+
+        {artifacts?.map((artifact) => (
+          <ArtifactCard
+            key={artifact.id}
+            artifact={artifact}
+            active={
+              isArtifactOpen &&
+              shownArtifacts.some((shown) => shown.id === artifact.id)
+            }
+            onOpen={() => dispatch(setArtifacts(artifacts))}
+          />
+        ))}
       </div>
 
       {lightbox && (

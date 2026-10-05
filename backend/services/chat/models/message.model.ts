@@ -1,5 +1,25 @@
 import { Schema, model, type InferSchemaType } from "mongoose";
 
+const fileSchema = new Schema(
+  {
+    name: String,
+    content: String,
+  },
+  { _id: false },
+);
+
+const artifactSchema = new Schema(
+  {
+    title: String,
+    id: Number,
+    type: String,
+    files: [fileSchema],
+  },
+  {
+    _id: false,
+  },
+);
+
 const messageSchema = new Schema(
   {
     conversationId: {
@@ -12,6 +32,7 @@ const messageSchema = new Schema(
     },
     content: String,
     images: [String],
+    artifacts: [artifactSchema],
   },
   {
     timestamps: true,

@@ -20,6 +20,7 @@ export const agentState = Annotation.Root({
   conversationId: Annotation<string>(),
   searchResults: Annotation<SearchResponse | null>(),
   images: Annotation<SearchImage[]>(),
+  artifacts: Annotation(),
 });
 
 // Shape of the state values passed to each node

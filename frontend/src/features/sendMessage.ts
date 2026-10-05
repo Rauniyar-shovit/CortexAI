@@ -1,4 +1,4 @@
-import type { AgentId } from "../types/types";
+import type { AgentId, Artifact } from "../types/types";
 import api from "../utils/axios";
 
 type Payload = {
@@ -10,6 +10,7 @@ type Payload = {
 export type AgentResponse = {
   answer: string;
   images: string[];
+  artifacts: Artifact[];
 };
 const sendMessage = async (payload: Payload) => {
   try {

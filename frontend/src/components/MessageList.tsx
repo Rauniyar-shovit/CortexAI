@@ -35,6 +35,7 @@ const MessageList = () => {
               role={message.role}
               content={message.content}
               images={message.images}
+              artifacts={message.artifacts}
             />
           ))}
         </div>
