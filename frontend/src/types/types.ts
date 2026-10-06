@@ -61,3 +61,5 @@ export type Agent = {
   icon: LucideIcon;
   hue: number;
 };
+
+export type PreviewFile = { name: string; content: string };

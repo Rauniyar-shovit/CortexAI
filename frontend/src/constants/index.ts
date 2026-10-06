@@ -17,3 +17,17 @@ export const agents: Agent[] = [
   { id: "image", label: "Image", icon: ImageIcon, hue: 250 },
   { id: "search", label: "Search", icon: Search, hue: 90 },
 ];
+
+// Per-extension highlighter language and tab-dot hue (design dots: oklch(0.78 0.1 <hue>)).
+
+export const FILE_TYPES: Record<string, { language: string; hue: number }> = {
+  js: { language: "javascript", hue: 40 },
+  jsx: { language: "javascript", hue: 40 },
+  ts: { language: "typescript", hue: 235 },
+  tsx: { language: "typescript", hue: 235 },
+  json: { language: "json", hue: 90 },
+  css: { language: "css", hue: 200 },
+  html: { language: "xml", hue: 20 },
+  py: { language: "python", hue: 130 },
+  md: { language: "markdown", hue: 290 },
+};

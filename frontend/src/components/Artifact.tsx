@@ -1,38 +1,17 @@
 import { useState } from "react";
-import { CodeXml, Copy, Download, X } from "lucide-react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import {
-  atomOneDark,
-  atomOneLight,
-} from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { useTheme } from "../utils/theme";
+import { Check, CodeXml, Copy, Download, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { closeArtifact } from "../redux/messageSlice";
 import type { RootState } from "../redux/store";
+import { FILE_TYPES } from "../constants";
+import PreviewArtifact from "./PreviewArtifact";
+import ArtifactCodeEditor from "./ArtifactCodeEditor";
 
-const ARTIFACT = {
-  title: "Netflix-style hero section",
-  meta: "Code artifact · Edited 2 min ago",
-  filename: "Hero.jsx",
-  language: "jsx",
-  version: "v2",
-  code: `export default function Hero({ movie, rows }) {
-  return (
-    <section className="bg-zinc-950 text-white">
-      <Nav />
-      <div className="relative h-[60vh] rounded-xl">
-        <img src={movie.backdrop} className="object-cover" />
-        <div className="absolute bottom-8 left-8">
-          <h1 className="text-5xl font-bold">{movie.title}</h1>
-          <p className="max-w-md">{movie.tagline}</p>
-          <PlayButtons />
-        </div>
-      </div>
-      <PosterRow title="Trending now" items={rows} />
-    </section>
-  );
-}`,
-};
+const fileType = (name: string) =>
+  FILE_TYPES[name.split(".").pop()?.toLowerCase() ?? ""] ?? {
+    language: "plaintext",
+    hue: 160,
+  };
 
 type Tab = "preview" | "code";
 
@@ -43,9 +22,33 @@ const Artifact = () => {
   const { artifacts } = useSelector((state: RootState) => state?.message);
   console.log("artifacts-----", artifacts);
   const dispatch = useDispatch();
-  const { theme } = useTheme();
   const [tab, setTab] = useState<Tab>("preview");
-  const lineCount = ARTIFACT.code.split("\n").length;
+
+  // Remember the picked file per artifact so a new artifact starts on its first file.
+  const [picked, setPicked] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  const artifact = artifacts[0];
+  const files = artifact?.files ?? [];
+
+  const activeIndex = picked < files.length ? picked : 0;
+  const activeFile = files[activeIndex];
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(activeFile?.content || "");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  const pickFile = (index: number) => {
+    setPicked(index);
+    setTab("code");
+  };
+
+  const htmlFile = files?.find((f) => f.name === "index.html");
+  const canPreview = !!htmlFile;
 
   const tabClass = (active: boolean) =>
     `cursor-pointer rounded-full px-3 py-1.25 text-[13px] font-bold transition-colors ${
@@ -64,7 +67,7 @@ const Artifact = () => {
         </div>
         <div className="flex min-w-0 flex-col">
           <h2 className="truncate capitalize text-xl font-extrabold text-ink">
-            {artifacts[0]?.title}
+            {artifact?.title}
           </h2>
         </div>
       </div>
@@ -76,15 +79,17 @@ const Artifact = () => {
           aria-label="Artifact view"
           className="flex gap-1 rounded-full bg-sf2 p-1"
         >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={tab === "preview"}
-            onClick={() => setTab("preview")}
-            className={tabClass(tab === "preview")}
-          >
-            Preview
-          </button>
+          {canPreview && (
+            <button
+              type="button"
+              role="tab"
+              aria-selected={tab === "preview"}
+              onClick={() => setTab("preview")}
+              className={tabClass(tab === "preview")}
+            >
+              Preview
+            </button>
+          )}
           <button
             type="button"
             role="tab"
@@ -95,20 +100,26 @@ const Artifact = () => {
             Code
           </button>
         </div>
-        <span className="text-sm font-bold text-ink">{ARTIFACT.filename}</span>
-        <span className="rounded-full bg-sf2 px-2.25 py-0.75 text-xs font-bold text-mu">
-          {ARTIFACT.version}
-        </span>
+        {activeFile && (
+          <span className="truncate text-sm font-bold text-ink">
+            {activeFile.name}
+          </span>
+        )}
 
         <div className="ml-auto flex gap-1.5">
-          <button type="button" className={pillButton}>
-            <Copy size={14} />
-            <span className="hidden sm:inline">Copy</span>
+          <button
+            type="button"
+            onClick={handleCopy}
+            disabled={!activeFile}
+            aria-label={copied ? "Copied" : "Copy code"}
+            className={pillButton}
+          >
+            {copied ? <Check size={14} /> : <Copy size={14} />}
+            <span className="hidden sm:inline">
+              {copied ? "Copied" : "Copy"}
+            </span>
           </button>
-          <button type="button" className={pillButton}>
-            <Download size={14} />
-            <span className="hidden sm:inline">Download</span>
-          </button>
+
           <button
             type="button"
             onClick={() => dispatch(closeArtifact())}
@@ -121,50 +132,54 @@ const Artifact = () => {
         </div>
       </div>
 
-      {tab === "preview" ? (
+      {/* File tabs */}
+      {files.length > 0 && (
+        <div className="flex items-center gap-1 border-b border-ln bg-sf px-3 py-2">
+          <div
+            role="tablist"
+            aria-label="Artifact files"
+            className="flex min-w-0 gap-1 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+          >
+            {files.map((file, i) => {
+              const active = i === activeIndex;
+              return (
+                <button
+                  key={file.name}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => pickFile(i)}
+                  title={file.name}
+                  className={`flex shrink-0 cursor-pointer items-center gap-1.75 rounded-[10px] px-2.75 py-1.5 font-mono text-[12.5px] font-bold transition-colors ${
+                    active ? "bg-sf2 text-ink" : "text-mu hover:text-ink"
+                  }`}
+                >
+                  <span
+                    className="size-1.75 shrink-0 rounded-full"
+                    style={{
+                      background: `oklch(0.78 0.1 ${fileType(file.name).hue})`,
+                    }}
+                  />
+                  {file.name}
+                </button>
+              );
+            })}
+          </div>
+          <span className="ml-auto shrink-0 pl-2 text-xs font-bold text-mu">
+            {files.length} {files.length === 1 ? "file" : "files"}
+          </span>
+        </div>
+      )}
+
+      {tab === "preview" && canPreview ? (
         <div className="flex min-h-0 flex-1 flex-col gap-2.5 p-4">
           {/* Placeholder for the sandboxed live preview */}
-          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-2xl bg-[repeating-linear-gradient(135deg,var(--sf2)_0_12px,var(--sf)_12px_24px)] text-center">
-            <span className="font-mono text-[13px] text-mu">live preview</span>
-            <span className="text-xs text-mu">
-              The generated app renders here
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-mu">
-            <span className="size-2 rounded-full bg-ac2" />
-            Live preview · updates as Onyx edits
-            <span className="ml-auto hidden font-bold sm:inline">
-              Desktop · Tablet · Mobile
-            </span>
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-2 rounded-2xl bg-ext-center">
+            <PreviewArtifact files={files} />
           </div>
         </div>
       ) : (
-        <div className="flex min-h-0 flex-1 overflow-auto bg-sf font-mono text-[13px] leading-[1.75]">
-          {/* Line-number gutter */}
-          <div
-            aria-hidden="true"
-            className="sticky left-0 shrink-0 bg-sf2 py-4 pr-3 pl-4 text-right whitespace-pre text-mu select-none"
-          >
-            {Array.from({ length: lineCount }, (_, i) => i + 1).join("\n")}
-          </div>
-          <SyntaxHighlighter
-            language={ARTIFACT.language}
-            style={theme === "dark" ? atomOneDark : atomOneLight}
-            // Panel supplies the surface; the theme only colours tokens.
-            customStyle={{
-              margin: 0,
-              padding: 16,
-              background: "transparent",
-              fontSize: 13,
-              lineHeight: 1.75,
-              overflow: "visible",
-              flex: 1,
-            }}
-            codeTagProps={{ style: { fontFamily: "var(--font-mono)" } }}
-          >
-            {ARTIFACT.code}
-          </SyntaxHighlighter>
-        </div>
+        <ArtifactCodeEditor file={activeFile} />
       )}
     </section>
   );

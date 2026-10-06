@@ -32,10 +32,17 @@ const ChatArea = () => {
       dispatch(setArtifacts(lastestArtifactMsg?.artifacts || []));
     };
 
-    if (selectedConversation) {
-      if (selectedConversation.title === "New Chat") return;
-      fetchMessages();
+    // No conversation selected (New chat) — drop the previous chat's messages so
+    // the next send doesn't append to them.
+    if (!selectedConversation) {
+      dispatch(setMessages([]));
+      dispatch(setArtifacts([]));
+
+      return;
     }
+
+    if (selectedConversation.title === "New Chat") return;
+    fetchMessages();
   }, [selectedConversation?._id]);
 
   return (

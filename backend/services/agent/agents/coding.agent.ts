@@ -36,6 +36,14 @@ Rules:
 - Hover Effects
 - Beautiful spacing
 - Single page unless user asks otherwise.
+
+IMAGES 
+=========================
+
+Always use real Unsplash images.
+
+Never use placeholders.
+
 Return ONLY valid JSON.
 
 Schema:
@@ -83,7 +91,8 @@ ${state.prompt}
     } catch {
       return {
         ...state,
-        aiResponse: "Sorry, the coding model returned invalid output. Please try again.",
+        aiResponse:
+          "Sorry, the coding model returned invalid output. Please try again.",
         artifacts: [],
       };
     }
