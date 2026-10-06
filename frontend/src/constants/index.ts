@@ -14,7 +14,7 @@ export const agents: Agent[] = [
   { id: "coding", label: "Coding", icon: Code, hue: 40 },
   { id: "pdf", label: "PDF", icon: FileText, hue: 310 },
   { id: "ppt", label: "PPT", icon: Presentation, hue: 130 },
-  { id: "image", label: "Image", icon: ImageIcon, hue: 250 },
+  { id: "vision", label: "Vision", icon: ImageIcon, hue: 250 },
   { id: "search", label: "Search", icon: Search, hue: 90 },
 ];
 

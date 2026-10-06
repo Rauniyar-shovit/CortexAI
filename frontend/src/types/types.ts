@@ -52,7 +52,7 @@ export type AgentId =
   | "coding"
   | "pdf"
   | "ppt"
-  | "image"
+  | "vision"
   | "search";
 
 export type Agent = {

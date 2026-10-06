@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Markdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Check, Copy, ExternalLink } from "lucide-react";
+import { Check, Copy, ExternalLink, ImageOff } from "lucide-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { useTheme } from "../utils/theme";
 import {
@@ -59,6 +59,54 @@ const CodeBlock = ({ language, code }: { language: string; code: string }) => {
   );
 };
 
+// Markdown image as a soft card: skeleton while loading, fallback on error, alt text as caption.
+// react-markdown nests images inside <p>, so everything here is a <span> to stay valid HTML.
+const ImageBlock = ({ src, alt }: { src?: string; alt?: string }) => {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
+    "loading",
+  );
+
+  if (!src || status === "error")
+    return (
+      <span className="flex items-center gap-2 rounded-[18px] bg-sf px-3.5 py-3 text-sm font-semibold text-mu">
+        <ImageOff size={15} strokeWidth={2.5} aria-hidden="true" />
+        {alt || "Image unavailable"}
+      </span>
+    );
+
+  return (
+    <span className="block overflow-hidden rounded-[18px] bg-sf">
+      <a
+        href={src}
+        target="_blank"
+        rel="noreferrer"
+        className="relative block bg-sf2"
+      >
+        {status === "loading" && (
+          <span className="block aspect-video w-full animate-pulse bg-sf2" />
+        )}
+        <img
+          src={src}
+          alt={alt ?? ""}
+          loading="lazy"
+          onLoad={() => setStatus("loaded")}
+          onError={() => setStatus("error")}
+          className={
+            status === "loaded"
+              ? "block max-h-120 w-full object-contain"
+              : "absolute h-0 w-0 opacity-0"
+          }
+        />
+      </a>
+      {alt && (
+        <span className="block px-3.5 py-2.5 text-xs font-bold text-mu">
+          {alt}
+        </span>
+      )}
+    </span>
+  );
+};
+
 const components: Components = {
   h1: ({ children }) => (
     <h1 className="mt-2 text-2xl font-extrabold text-ink">{children}</h1>
@@ -104,6 +152,9 @@ const components: Components = {
     <blockquote className="rounded-r-[14px] border-l-4 border-ac bg-sf px-4 py-2.5 text-mu">
       {children}
     </blockquote>
+  ),
+  img: ({ src, alt }) => (
+    <ImageBlock src={typeof src === "string" ? src : undefined} alt={alt} />
   ),
   hr: () => <hr className="border-ln" />,
   table: ({ children }) => (

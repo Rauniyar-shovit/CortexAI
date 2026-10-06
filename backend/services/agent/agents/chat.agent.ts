@@ -10,61 +10,71 @@ import { AgentState } from "../graph/state";
 import type { Message } from "../types/types";
 
 export const chatAgent = async (state: AgentState) => {
-  const llm = await getModel("chat");
+  try {
+    const llm = await getModel("chat");
 
-  const history = await getMemory(state.conversationId);
+    const history = await getMemory(state.conversationId);
 
-  const searchContext = state.searchResults
-    ? `Web Search Results: 
+    const searchContext = state.searchResults
+      ? `Web Search Results: 
   
-  ${JSON.stringify(state.searchResults)}
+    ${JSON.stringify(state.searchResults)}
   
-  Answer the user using only the above search results.
-  `
-    : "";
+    Answer the user using only the above search results.
+    `
+      : "";
 
-  const systemPrompt = `Your are OnyxAI, an intelligent AI assistant 
+    const systemPrompt = `Your are OnyxAI, an intelligent AI assistant 
 
-  ${searchContext}
+    ${searchContext}
 
-    if searchContext exists:
-    - Use search results to answer. 
-    - Do not mention internal tools
+      if searchContext exists:
+      - Use search results to answer. 
+      - Do not mention internal tools
 
-  Rules:
-- For simple questions, greetings, and short queries, respond naturally in plain
-- For technical, educational, coding, or detailed topics, use clean Markdown.
+    Rules:
+  - For simple questions, greetings, and short queries, respond naturally in plain
+  - For technical, educational, coding, or detailed topics, use clean Markdown.
  
-  Formatting
-- Use # for titles and it for sections.
-- Leave a blank Line after headings.
-- Use bullet points for lists.
-- Use numbered Lists for steps•
-- Use fenced code blocks with Language tags for code.
-- Keep paragraphs short and readable.
-- Never write headings and content on the same line.
-- Never generate Large walls of text.
-`;
+    Formatting
+  - Use # for titles and it for sections.
+  - Leave a blank Line after headings.
+  - Use bullet points for lists.
+  - Use numbered Lists for steps•
+  - Use fenced code blocks with Language tags for code.
+  - Keep paragraphs short and readable.
+  - Never write headings and content on the same line.
+  - Never generate Large walls of text.
+  `;
 
-  const messages: BaseMessage[] = [new SystemMessage(systemPrompt)];
+    const messages: BaseMessage[] = [new SystemMessage(systemPrompt)];
 
-  history?.forEach((msg: Message) => {
-    // Skip malformed entries (e.g. cached with undefined content)
-    if (typeof msg?.content !== "string" || !msg.content) return;
-    if (msg.role === "user") {
-      messages.push(new HumanMessage(msg.content));
-    }
-    if (msg.role === "assistant") {
-      messages.push(new AIMessage(msg.content));
-    }
-  });
+    history?.forEach((msg: Message) => {
+      // Skip malformed entries (e.g. cached with undefined content)
+      if (typeof msg?.content !== "string" || !msg.content) return;
+      if (msg.role === "user") {
+        messages.push(new HumanMessage(msg.content));
+      }
+      if (msg.role === "assistant") {
+        messages.push(new AIMessage(msg.content));
+      }
+    });
 
-  messages.push(new HumanMessage(state.prompt));
+    messages.push(new HumanMessage(state.prompt));
 
-  const response = await llm.invoke(messages);
+    const response = await llm.invoke(messages);
 
-  return {
-    ...state,
-    aiResponse: response.content,
-  };
+    return {
+      ...state,
+      aiResponse: response.text,
+    };
+  } catch (error) {
+    console.error("Chat agent error:", error);
+
+    return {
+      ...state,
+      aiResponse:
+        "Sorry, something went wrong while generating a response. Please try again.",
+    };
+  }
 };
