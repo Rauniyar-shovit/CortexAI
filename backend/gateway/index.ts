@@ -15,6 +15,7 @@ const env = cleanEnv(process.env, {
   CHAT_SERVICE: str(),
   AGENT_SERVICE: str(),
   FRONTEND_URL: str(),
+  BILLING_SERVICE: str(),
 });
 
 const gatewayPort = env.PORT;
@@ -34,6 +35,12 @@ app.use("/api/auth", proxy(env.AUTH_SERVICE));
 app.use("/api/chat", protect, proxyWithHeader(env.CHAT_SERVICE));
 app.use("/api/agent", protect, proxy(env.AGENT_SERVICE));
 app.get("/api/getCurrentUser", protect, getCurrentUser);
+// Stripe calls the webhook directly, so it can't sit behind the session check
+app.use(
+  "/api/billing/webhook",
+  proxy(env.BILLING_SERVICE, { proxyReqPathResolver: () => "/webhook" }),
+);
+app.use("/api/billing", protect, proxyWithHeader(env.BILLING_SERVICE));
 
 app.get("/", (req, res) => {
   res.json({ message: "hello from gateway" });

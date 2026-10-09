@@ -63,3 +63,12 @@ export type Agent = {
 };
 
 export type PreviewFile = { name: string; content: string };
+
+export type PlanId = "free" | "starter" | "pro";
+
+export type Subscription = {
+  plan: PlanId;
+  status: string;
+  credits: number;
+  currentPeriodEnd: string | null;
+};

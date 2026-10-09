@@ -4,9 +4,7 @@ import Message from "../models/message.model.ts";
 
 export const createConverstion = async (req: Request, res: Response) => {
   try {
-    console.log("herer, clicked");
     const userId = req.headers["x-user-id"];
-    console.log("userId", userId);
 
     const conversation = await Conversation.create({
       userId: userId as string,
