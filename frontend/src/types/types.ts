@@ -72,3 +72,9 @@ export type Subscription = {
   credits: number;
   currentPeriodEnd: string | null;
 };
+
+export type CheckoutSession = {
+  message: string;
+  checkoutUrl?: string;
+  alreadySubscribed?: boolean;
+};

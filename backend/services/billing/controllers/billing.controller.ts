@@ -92,7 +92,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       amount: selectedPlan.amount,
       credits: selectedPlan.credits,
       plan: selectedPlan.id,
-      currency: session.currency?.toUpperCase() || "AUD",
+      currency: "AUD",
       status: "created",
     });
 
@@ -182,6 +182,7 @@ export const handleWebhook = async (req: Request, res: Response) => {
     return res.sendStatus(400);
   }
 
+  console.log("==================+WEBHOOOK=============");
   try {
     switch (event.type) {
       case "checkout.session.completed":

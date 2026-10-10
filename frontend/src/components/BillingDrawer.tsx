@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import createOrder from "../features/createOrder";
+import createPortalSession from "../features/createPortalSession";
 import getSubscription from "../features/getSubscription";
 import type { PlanId, Subscription } from "../types/types";
 
@@ -32,7 +34,7 @@ const getRenewalText = (subscription: Subscription) => {
 
 const PLANS = [
   {
-    id: "starter",
+    id: "starter" as const,
     name: "Starter",
     price: "A$10",
     credits: "500 credits / mo",
@@ -41,7 +43,7 @@ const PLANS = [
     popular: false,
   },
   {
-    id: "pro",
+    id: "pro" as const,
     name: "Pro",
     price: "A$30",
     credits: "1,000 credits / mo",
@@ -59,18 +61,63 @@ type BillingDrawerProps = {
 const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(false);
+  console.log(subscription);
+
+  // Which button is waiting on Stripe: a plan id, or "portal"
+  const [redirecting, setRedirecting] = useState<PlanId | "portal" | null>(
+    null,
+  );
+  const [error, setError] = useState<string | null>(null);
+
+  const isPaid = !!subscription && subscription.plan !== "free";
 
   // Refetch on every open so the drawer reflects a just-finished checkout
   useEffect(() => {
     if (!open) return;
     const fetchSubscription = async () => {
       setLoading(true);
+      setError(null);
       const data = await getSubscription();
       setSubscription(data);
       setLoading(false);
     };
     fetchSubscription();
   }, [open]);
+
+  const openPortal = async () => {
+    setRedirecting("portal");
+    const portalUrl = await createPortalSession();
+    if (portalUrl) {
+      window.location.href = portalUrl;
+      return;
+    }
+    setError("Couldn't open the billing portal, please try again");
+    setRedirecting(null);
+  };
+
+  const handleChoosePlan = async (plan: PlanId) => {
+    setError(null);
+
+    if (isPaid) {
+      await openPortal();
+      return;
+    }
+
+    setRedirecting(plan);
+    const order = await createOrder(plan);
+
+    if (order?.checkoutUrl) {
+      window.location.href = order.checkoutUrl;
+      return;
+    }
+    if (order?.alreadySubscribed) {
+      await openPortal();
+      return;
+    }
+
+    setError("Couldn't start checkout, please try again");
+    setRedirecting(null);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -142,6 +189,16 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
               >
                 {getRenewalText(subscription)}
               </div>
+              {isPaid && (
+                <button
+                  type="button"
+                  onClick={openPortal}
+                  disabled={!!redirecting}
+                  className="flex h-9 cursor-pointer items-center justify-center rounded-xl bg-sf2 text-[13px] font-extrabold text-ink transition-opacity hover:opacity-85 disabled:cursor-default disabled:opacity-50"
+                >
+                  {redirecting === "portal" ? "Opening…" : "Manage billing"}
+                </button>
+              )}
             </>
           ) : (
             <div className="text-sm text-mu">
@@ -149,6 +206,12 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
             </div>
           )}
         </div>
+
+        {error && (
+          <div role="alert" className="text-center text-xs font-bold text-ink">
+            {error}
+          </div>
+        )}
 
         {/* Plans */}
         {PLANS.map((plan) => (
@@ -180,12 +243,17 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
             </div>
             <button
               type="button"
-              disabled={subscription?.plan === plan.id}
+              onClick={() => handleChoosePlan(plan.id)}
+              disabled={subscription?.plan === plan.id || !!redirecting}
               className={`flex h-[42px] cursor-pointer items-center justify-center rounded-[14px] text-sm font-extrabold transition-opacity hover:opacity-85 disabled:cursor-default disabled:opacity-50 ${
                 plan.popular ? "bg-ink text-bg" : "bg-sf2 text-ink"
               }`}
             >
-              {subscription?.plan === plan.id ? "Current plan" : plan.cta}
+              {subscription?.plan === plan.id
+                ? "Current plan"
+                : redirecting === plan.id
+                  ? "Redirecting…"
+                  : plan.cta}
             </button>
           </div>
         ))}

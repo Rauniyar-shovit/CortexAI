@@ -24,7 +24,7 @@ export const PLANS: Record<PlanKey, Plan> = {
     amount: 10,
     credits: 500,
     validity: 30,
-    lookupKey: "prod_VPRCwFZLMKOdlR",
+    lookupKey: "onyx_starter_monthly",
   },
   pro: {
     id: "pro",
@@ -32,7 +32,7 @@ export const PLANS: Record<PlanKey, Plan> = {
     amount: 30,
     credits: 1000,
     validity: 30,
-    lookupKey: "cortex_pro_monthly",
+    lookupKey: "onyx_pro_monthly",
   },
 };
 
