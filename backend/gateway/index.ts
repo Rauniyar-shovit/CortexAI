@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/api/auth", proxy(env.AUTH_SERVICE));
 app.use("/api/chat", protect, proxyWithHeader(env.CHAT_SERVICE));
-app.use("/api/agent", protect, proxy(env.AGENT_SERVICE));
+app.use("/api/agent", protect, proxyWithHeader(env.AGENT_SERVICE));
 app.get("/api/getCurrentUser", protect, getCurrentUser);
 // Stripe calls the webhook directly, so it can't sit behind the session check
 app.use(

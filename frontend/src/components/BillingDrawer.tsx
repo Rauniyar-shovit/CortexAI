@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { X } from "lucide-react";
 import createOrder from "../features/createOrder";
 import createPortalSession from "../features/createPortalSession";
 import getSubscription from "../features/getSubscription";
 import type { PlanId, Subscription } from "../types/types";
-
-const PLAN_NAMES: Record<PlanId, string> = {
-  free: "Free",
-  starter: "Starter",
-  pro: "Pro",
-};
+import type { RootState } from "../redux/store";
+import { setSubscription } from "../redux/billingSlice";
+import { PLAN_NAMES } from "../constants";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -17,17 +15,19 @@ const getRenewalText = (subscription: Subscription) => {
   if (subscription.status === "past_due") {
     return "Payment failed, update your card to keep your plan";
   }
-  if (!subscription.currentPeriodEnd) {
+  const endDate = subscription.cancelAt ?? subscription.currentPeriodEnd;
+  if (!endDate) {
     return "Upgrade for more monthly credits";
   }
 
   const days = Math.max(
     0,
-    Math.ceil(
-      (new Date(subscription.currentPeriodEnd).getTime() - Date.now()) / DAY_MS,
-    ),
+    Math.ceil((new Date(endDate).getTime() - Date.now()) / DAY_MS),
   );
-  const verb = subscription.status === "canceled" ? "Ends" : "Renews";
+  const verb =
+    subscription.cancelAt || subscription.status === "canceled"
+      ? "Ends"
+      : "Renews";
 
   return `${verb} in ${days} ${days === 1 ? "day" : "days"}`;
 };
@@ -59,9 +59,9 @@ type BillingDrawerProps = {
 };
 
 const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const { subscription } = useSelector((state: RootState) => state.billing);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  console.log(subscription);
 
   // Which button is waiting on Stripe: a plan id, or "portal"
   const [redirecting, setRedirecting] = useState<PlanId | "portal" | null>(
@@ -71,6 +71,13 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
 
   const isPaid = !!subscription && subscription.plan !== "free";
 
+  const remainingCredits = subscription
+    ? Math.max(0, subscription.totalCredits - subscription.usedCredits)
+    : 0;
+  const remainingPercent = subscription?.totalCredits
+    ? (remainingCredits / subscription.totalCredits) * 100
+    : 0;
+
   // Refetch on every open so the drawer reflects a just-finished checkout
   useEffect(() => {
     if (!open) return;
@@ -78,15 +85,15 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
       setLoading(true);
       setError(null);
       const data = await getSubscription();
-      setSubscription(data);
+      dispatch(setSubscription(data));
       setLoading(false);
     };
     fetchSubscription();
-  }, [open]);
+  }, [open, dispatch]);
 
-  const openPortal = async () => {
-    setRedirecting("portal");
-    const portalUrl = await createPortalSession();
+  const openPortal = async (plan?: PlanId) => {
+    setRedirecting(plan ?? "portal");
+    const portalUrl = await createPortalSession(plan);
     if (portalUrl) {
       window.location.href = portalUrl;
       return;
@@ -99,7 +106,7 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
     setError(null);
 
     if (isPaid) {
-      await openPortal();
+      await openPortal(plan);
       return;
     }
 
@@ -111,7 +118,7 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
       return;
     }
     if (order?.alreadySubscribed) {
-      await openPortal();
+      await openPortal(plan);
       return;
     }
 
@@ -176,9 +183,24 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
             <>
               <div className="flex items-baseline gap-1.5">
                 <div className="text-[28px] font-extrabold text-ink">
-                  {subscription.credits.toLocaleString()}
+                  {remainingCredits.toLocaleString()}
                 </div>
-                <div className="text-sm font-bold text-mu">credits / month</div>
+                <div className="text-sm font-bold text-mu">
+                  / {subscription.totalCredits.toLocaleString()} credits left
+                </div>
+              </div>
+              <div
+                role="progressbar"
+                aria-label="Credits remaining"
+                aria-valuemin={0}
+                aria-valuemax={subscription.totalCredits}
+                aria-valuenow={remainingCredits}
+                className="h-2 overflow-hidden rounded-full bg-sf2"
+              >
+                <div
+                  className="h-full rounded-full bg-ac transition-[width] duration-500"
+                  style={{ width: `${remainingPercent}%` }}
+                />
               </div>
               <div
                 className={`text-xs ${
@@ -192,7 +214,7 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
               {isPaid && (
                 <button
                   type="button"
-                  onClick={openPortal}
+                  onClick={() => openPortal()}
                   disabled={!!redirecting}
                   className="flex h-9 cursor-pointer items-center justify-center rounded-xl bg-sf2 text-[13px] font-extrabold text-ink transition-opacity hover:opacity-85 disabled:cursor-default disabled:opacity-50"
                 >

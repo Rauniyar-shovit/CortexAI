@@ -4,7 +4,7 @@ export type Plan = {
   id: PlanKey;
   name: string;
   amount: number;
-  credits: number;
+  totalCredits: number;
   validity: number;
   // Lookup key set on the recurring Price in the Stripe Dashboard
   lookupKey?: string;
@@ -15,14 +15,14 @@ export const PLANS: Record<PlanKey, Plan> = {
     id: "free",
     name: "Free",
     amount: 0,
-    credits: 100,
+    totalCredits: 100,
     validity: 30,
   },
   starter: {
     id: "starter",
     name: "Starter",
     amount: 10,
-    credits: 500,
+    totalCredits: 500,
     validity: 30,
     lookupKey: "onyx_starter_monthly",
   },
@@ -30,7 +30,7 @@ export const PLANS: Record<PlanKey, Plan> = {
     id: "pro",
     name: "Pro",
     amount: 30,
-    credits: 1000,
+    totalCredits: 1000,
     validity: 30,
     lookupKey: "onyx_pro_monthly",
   },

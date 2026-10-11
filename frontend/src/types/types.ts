@@ -69,8 +69,12 @@ export type PlanId = "free" | "starter" | "pro";
 export type Subscription = {
   plan: PlanId;
   status: string;
-  credits: number;
+  totalCredits: number;
+  usedCredits: number;
   currentPeriodEnd: string | null;
+  cancelAt: string | null;
+  // When usedCredits goes back to 0 (renewal, or the free period ending)
+  creditsResetAt: string | null;
 };
 
 export type CheckoutSession = {

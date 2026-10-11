@@ -7,7 +7,14 @@ import {
   Search,
   Zap,
 } from "lucide-react";
-import type { Agent } from "../types/types";
+import type { Agent, PlanId } from "../types/types";
+
+export const PLAN_NAMES: Record<PlanId, string> = {
+  free: "Free",
+  starter: "Starter",
+  pro: "Pro",
+};
+
 export const agents: Agent[] = [
   { id: "auto", label: "Auto", icon: Zap, hue: 290 },
   { id: "chat", label: "Chat", icon: MessageCircle, hue: 350 },

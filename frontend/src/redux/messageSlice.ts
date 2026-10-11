@@ -24,6 +24,11 @@ const messageSlice = createSlice({
       state.messages?.push(action.payload);
     },
 
+    // Undo an optimistic message the server rejected
+    removeLastMessage: (state) => {
+      state.messages?.pop();
+    },
+
     // Showing new artifacts opens the panel, as the design does when a response contains one.
     setArtifacts: (state, action: PayloadAction<Artifact[]>) => {
       state.artifacts = action.payload;
@@ -36,6 +41,11 @@ const messageSlice = createSlice({
   },
 });
 
-export const { setMessages, addMessage, setArtifacts, closeArtifact } =
-  messageSlice.actions;
+export const {
+  setMessages,
+  addMessage,
+  removeLastMessage,
+  setArtifacts,
+  closeArtifact,
+} = messageSlice.actions;
 export default messageSlice.reducer;

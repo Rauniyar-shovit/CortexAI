@@ -27,21 +27,38 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       default: "AUD",
     },
-    credits: {
+    // Credits spent this period; a renewal or plan change is a new
+    // document, so the count starts again from 0
+    usedCredits: {
       type: Number,
+      default: 0,
+    },
+    totalCredits: {
+      type: Number,
+      default: 100,
     },
     plan: {
       type: String,
     },
     status: {
       type: String,
-      enum: ["created", "paid", "failed", "cancelled"],
+      // "free" is the credit allowance for users without a paid plan
+      enum: ["created", "paid", "failed", "cancelled", "free"],
     },
     // Mirrors Stripe's subscription status (active, past_due, canceled, ...)
     subscriptionStatus: String,
     currentPeriodEnd: Date,
+    // When a scheduled cancellation takes effect; null if it will renew
+    cancelAt: Date,
   },
   { timestamps: true },
+);
+
+// One free credit allowance per user; getCreditAccount relies on this to
+// stop its upsert from creating duplicates
+paymentSchema.index(
+  { userId: 1 },
+  { unique: true, partialFilterExpression: { status: "free" } },
 );
 
 export type Payment = InferSchemaType<typeof paymentSchema>;

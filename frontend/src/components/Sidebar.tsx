@@ -18,10 +18,14 @@ import { auth } from "../utils/firebase";
 import logOut from "../features/logout";
 import { setArtifacts } from "../redux/messageSlice";
 import BillingDrawer from "./BillingDrawer";
+import getSubscription from "../features/getSubscription";
+import {
+  setBillingOpen as setBillingOpenAction,
+  setSubscription,
+} from "../redux/billingSlice";
+import { PLAN_NAMES } from "../constants";
 
-// Placeholder credits — replace with real data from the backend.
-const CREDITS = { left: 42, total: 100, resetsInDays: 6 };
-const creditsPercent = `${(CREDITS.left / CREDITS.total) * 100}%`;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const COLLAPSED_KEY = "onyx-sidebar-collapsed";
 
@@ -39,10 +43,31 @@ const Sidebar = () => {
   );
 
   const { userData } = useSelector((state: RootState) => state.user);
+  const { subscription, isBillingOpen } = useSelector(
+    (state: RootState) => state.billing,
+  );
+  const setBillingOpen = (open: boolean) =>
+    dispatch(setBillingOpenAction(open));
+
+  const totalCredits = subscription?.totalCredits ?? 0;
+  const creditsLeft = Math.max(
+    0,
+    totalCredits - (subscription?.usedCredits ?? 0),
+  );
+  const creditsPercent = `${totalCredits ? (creditsLeft / totalCredits) * 100 : 0}%`;
+  const resetsInDays = subscription?.creditsResetAt
+    ? Math.max(
+        0,
+        Math.ceil(
+          (new Date(subscription.creditsResetAt).getTime() - Date.now()) /
+            DAY_MS,
+        ),
+      )
+    : null;
+  const planName = PLAN_NAMES[subscription?.plan ?? "free"];
 
   const [imageError, setImageError] = useState(false);
   const [collapsed, setCollapsed] = useState(readCollapsed);
-  const [billingOpen, setBillingOpen] = useState(false);
 
   const isEmpty = !conversations?.length;
   const { theme, toggleTheme } = useTheme();
@@ -57,6 +82,13 @@ const Sidebar = () => {
     };
     fetchConversation();
   }, [userData?.userId]);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      dispatch(setSubscription(await getSubscription()));
+    };
+    fetchSubscription();
+  }, []);
 
   const handleCreateConverstion = async () => {
     const data = await createConversation();
@@ -140,21 +172,22 @@ const Sidebar = () => {
             Chats
           </button>
 
-          {/* Credits — placeholder until the backend tracks credits */}
+          {/* Credits */}
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               setBillingOpen(true);
             }}
-            title={`${CREDITS.left} / ${CREDITS.total} credits`}
+            title={`${creditsLeft} / ${totalCredits} credits`}
             className="mt-auto flex w-11 cursor-pointer flex-col items-center gap-1 rounded-[14px] bg-sf py-2 transition-colors hover:bg-sf2"
           >
-            <div className="text-sm font-extrabold text-ink">
-              {CREDITS.left}
-            </div>
+            <div className="text-sm font-extrabold text-ink">{creditsLeft}</div>
             <div className="h-[5px] w-[26px] overflow-hidden rounded-full bg-sf2">
-              <div className="h-full bg-ac" style={{ width: creditsPercent }} />
+              <div
+                className="h-full bg-ac transition-[width] duration-500"
+                style={{ width: creditsPercent }}
+              />
             </div>
           </button>
 
@@ -209,7 +242,7 @@ const Sidebar = () => {
             </button>
             <div className="text-[21px] font-extrabold text-ink">Onyx</div>
             <div className="ml-auto rounded-full bg-ac px-[9px] py-[3px] text-xs font-bold text-aci">
-              Free
+              {planName}
             </div>
           </div>
 
@@ -269,28 +302,29 @@ const Sidebar = () => {
           )}
 
           <div className="mt-auto flex flex-col gap-2.5">
-            {/* Credits — placeholder until the backend tracks credits */}
+            {/* Credits */}
             <div className="flex flex-col gap-2 rounded-2xl bg-sf p-3">
               <div className="flex items-center gap-1">
                 <div className="text-[13px] font-bold text-ink flex gap-2">
                   <Coins size={18} className="text-ac" /> Credits
                 </div>
                 <div className="ml-auto text-[13px] font-bold text-ink">
-                  {CREDITS.left}
+                  {creditsLeft}
                   <span className="font-semibold text-mu">
                     {" "}
-                    / {CREDITS.total}
+                    / {totalCredits}
                   </span>
                 </div>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-sf2">
                 <div
-                  className="h-full rounded-full bg-ac"
+                  className="h-full rounded-full bg-ac transition-[width] duration-500"
                   style={{ width: creditsPercent }}
                 />
               </div>
               <div className="flex items-center text-xs text-mu">
-                Resets in {CREDITS.resetsInDays} days
+                {resetsInDays !== null &&
+                  `Resets in ${resetsInDays} ${resetsInDays === 1 ? "day" : "days"}`}
                 <button
                   type="button"
                   onClick={() => setBillingOpen(true)}
@@ -340,7 +374,7 @@ const Sidebar = () => {
                   {userData?.name || "User"}
                 </div>
                 <div className="truncate text-xs text-mu">
-                  Free plan ·{" "}
+                  {planName} plan ·{" "}
                   <button
                     type="button"
                     onClick={() => setBillingOpen(true)}
@@ -355,7 +389,10 @@ const Sidebar = () => {
         </div>
       </aside>
 
-      <BillingDrawer open={billingOpen} onClose={() => setBillingOpen(false)} />
+      <BillingDrawer
+        open={isBillingOpen}
+        onClose={() => setBillingOpen(false)}
+      />
     </>
   );
 };

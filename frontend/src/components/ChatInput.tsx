@@ -3,7 +3,11 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import sendMessage from "../features/sendMessage";
-import { addMessage, setArtifacts } from "../redux/messageSlice";
+import {
+  addMessage,
+  removeLastMessage,
+  setArtifacts,
+} from "../redux/messageSlice";
 import createConversation from "../features/createConversation";
 import {
   addConversation,
@@ -13,6 +17,8 @@ import {
 import updateConversation from "../features/updateConversation";
 import { agents } from "../constants";
 import type { AgentId } from "../types/types";
+import { setRemainingCredits } from "../redux/billingSlice";
+import NoCredits from "./NoCredits";
 
 // Mode dot hues from the design: oklch(0.84 0.08 <hue>)
 
@@ -28,11 +34,16 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
   );
 
   const [selectedAgent, setSelectedAgent] = useState<AgentId>("auto");
+  const [noCredits, setNoCredits] = useState<{
+    cost: number;
+    remainingCredits: number;
+  } | null>(null);
 
   const dispatch = useDispatch();
 
   const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setNoCredits(null);
 
     let conversation = selectedConversation;
 
@@ -71,6 +82,21 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
 
     if (!data) return;
 
+    if ("noCredits" in data) {
+      // Nothing was saved server-side: drop the optimistic message and give
+      // the user their text back
+      dispatch(removeLastMessage());
+      setValue(value);
+      dispatch(setRemainingCredits(data.remainingCredits));
+      setNoCredits({
+        cost: data.cost,
+        remainingCredits: data.remainingCredits,
+      });
+      return;
+    }
+
+    dispatch(setRemainingCredits(data.remainingCredits));
+
     dispatch(
       addMessage({
         role: "assistant",
@@ -88,6 +114,13 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
 
   return (
     <div className="mx-auto flex w-full max-w-190 flex-col gap-2.5">
+      {noCredits && (
+        <NoCredits
+          cost={noCredits.cost}
+          remainingCredits={noCredits.remainingCredits}
+          onDismiss={() => setNoCredits(null)}
+        />
+      )}
       <form
         onSubmit={handleSendMessage}
         className="flex flex-col gap-2.5 rounded-[26px] bg-sf p-3.5 shadow-composer"
