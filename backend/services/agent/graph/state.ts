@@ -1,5 +1,6 @@
 import { Annotation } from "@langchain/langgraph";
 import type { TavilySearchResponseWithImageDescriptions } from "@langchain/tavily";
+import { File } from "node:buffer";
 
 export type AgentName =
   | "search"
@@ -8,7 +9,9 @@ export type AgentName =
   | "vision"
   | "pdf"
   | "ppt"
-  | "auto";
+  | "auto"
+  | "pdfRag"
+  | "imageAnalyzer";
 
 export type SearchResponse = TavilySearchResponseWithImageDescriptions;
 export type SearchImage = NonNullable<SearchResponse["images"]>[number];
@@ -21,6 +24,7 @@ export const agentState = Annotation.Root({
   searchResults: Annotation<SearchResponse | null>(),
   images: Annotation<SearchImage[]>(),
   artifacts: Annotation(),
+  file: Annotation<Express.Multer.File | undefined>(),
 });
 
 // Shape of the state values passed to each node

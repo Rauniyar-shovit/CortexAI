@@ -28,6 +28,7 @@ export const agent = async (req: Request, res: Response) => {
   try {
     const { prompt, conversationId, agent } = req.body;
     const userId = req.headers["x-user-id"];
+    const file = req.file;
 
     if (typeof userId !== "string") {
       return res.status(401).json({ message: "Unauthorized" });
@@ -62,6 +63,7 @@ export const agent = async (req: Request, res: Response) => {
       prompt,
       conversationId,
       agent: resolvedAgent,
+      file,
     });
 
     const response = result.aiResponse;

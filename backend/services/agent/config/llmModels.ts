@@ -37,6 +37,9 @@ export const getModel = async (agent: string) => {
     case "coding":
       return openrouter.withFallbacks([groq]);
 
+    case "imageAnalyzer":
+      return gemini;
+
     default:
       return groq;
   }

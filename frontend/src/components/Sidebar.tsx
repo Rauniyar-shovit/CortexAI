@@ -65,6 +65,7 @@ const Sidebar = () => {
       )
     : null;
   const planName = PLAN_NAMES[subscription?.plan ?? "free"];
+  const isFreePlan = (subscription?.plan ?? "free") === "free";
 
   const [imageError, setImageError] = useState(false);
   const [collapsed, setCollapsed] = useState(readCollapsed);
@@ -374,14 +375,19 @@ const Sidebar = () => {
                   {userData?.name || "User"}
                 </div>
                 <div className="truncate text-xs text-mu">
-                  {planName} plan ·{" "}
-                  <button
-                    type="button"
-                    onClick={() => setBillingOpen(true)}
-                    className="cursor-pointer font-bold text-ink hover:underline"
-                  >
-                    Upgrade
-                  </button>
+                  {planName} plan
+                  {isFreePlan && (
+                    <>
+                      {" · "}
+                      <button
+                        type="button"
+                        onClick={() => setBillingOpen(true)}
+                        className="cursor-pointer font-bold text-ink hover:underline"
+                      >
+                        Upgrade
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
