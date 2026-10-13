@@ -7,20 +7,6 @@ import {
 } from "../redux/conversationSlice";
 import { setArtifacts } from "../redux/messageSlice";
 
-type ChatMode = "Auto" | "Chat" | "Coding" | "PDF" | "PPT" | "Image" | "Search";
-
-const MODE_CHIP: Record<ChatMode, string> = {
-  // Chip background per mode, as used in the design's chat headers.
-
-  Auto: "bg-ac",
-  Chat: "bg-ac2",
-  Coding: "bg-ac3",
-  PDF: "bg-ac",
-  PPT: "bg-ac2",
-  Image: "bg-ac",
-  Search: "bg-ac3",
-};
-
 // Design only — values are placeholders until wired to the selected conversation.
 const ChatNavbar = () => {
   const { selectedConversation } = useSelector(

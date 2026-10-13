@@ -1,10 +1,10 @@
 import { cleanEnv, str } from "envalid";
 import type { Request, Response, NextFunction } from "express";
 import axios from "axios";
-import { graph } from "../graph/graph";
-import { router } from "../graph/router";
+import { graph } from "../graph/graph.ts";
+import { router } from "../graph/router.ts";
 import type { AgentName } from "../graph/state.ts";
-import { addMessage } from "../config/memory";
+import { addMessage } from "../config/memory.ts";
 import { deductCredit } from "../utils/deductCredit.ts";
 const env = cleanEnv(process.env, {
   CHAT_SERVICE: str(),

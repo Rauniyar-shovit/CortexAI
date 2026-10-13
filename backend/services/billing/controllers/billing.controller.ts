@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import Stripe from "stripe";
-import { PLANS, Plan, PlanKey, getPlanByLookupKey } from "../config/Plans.ts";
+import { PLANS, type Plan, type PlanKey, getPlanByLookupKey } from "../config/Plans.ts";
 import { stripe, stripeEnv } from "../config/stripe.ts";
 import Payment from "../models/payment.model.ts";
 

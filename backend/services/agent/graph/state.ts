@@ -1,6 +1,5 @@
 import { Annotation } from "@langchain/langgraph";
 import type { TavilySearchResponseWithImageDescriptions } from "@langchain/tavily";
-import { File } from "node:buffer";
 
 export type AgentName =
   | "search"

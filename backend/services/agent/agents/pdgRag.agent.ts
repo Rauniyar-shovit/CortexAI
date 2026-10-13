@@ -1,12 +1,12 @@
-import { AgentState } from "../graph/state";
+import type { AgentState } from "../graph/state.ts";
 import { PDFParse } from "pdf-parse";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
 import fs from "fs";
-import { vectorStore } from "../config/vectorDb";
-import { getModel } from "../config/llmModels";
+import { vectorStore } from "../config/vectorDb.ts";
+import { getModel } from "../config/llmModels.ts";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { checkAgentLimit } from "../config/agentLimit";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const pdfRagAgent = async (state: AgentState) => {
   try {

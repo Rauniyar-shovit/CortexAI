@@ -1,6 +1,6 @@
 import { stat } from "node:fs";
 import { getModel } from "../config/llmModels.ts";
-import { AgentState } from "./state.ts";
+import type { AgentState } from "./state.ts";
 
 export const router = async (state: AgentState) => {
   if (state.agent && state.agent !== "auto") {

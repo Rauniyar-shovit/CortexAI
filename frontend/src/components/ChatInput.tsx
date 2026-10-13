@@ -4,7 +4,6 @@ import {
   ImageIcon,
   Mic,
   Paperclip,
-  Plus,
   XIcon,
 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -41,6 +40,7 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
   const { selectedConversation } = useSelector(
     (state: RootState) => state?.conversation,
   );
+  const { isLoading } = useSelector((state: RootState) => state?.message);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   console.log(selectedFile);
@@ -54,8 +54,12 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
 
   const dispatch = useDispatch();
 
+  // Text is optional when a file is attached
+  const canSend = (value.trim() !== "" || selectedFile !== null) && !isLoading;
+
   const handleSendMessage = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!canSend) return;
     setNoCredits(null);
 
     dispatch(setIsLoading(true));
@@ -71,13 +75,16 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
     if (conversation?.title === "New Chat") {
       await updateConversation({
         id: conversation._id,
-        title: value.trim(),
+        title: value.trim() || selectedFile?.name || "New Chat",
       });
 
       dispatch(
         setConvTitle({
           conversationId: conversation._id,
-          title: value.slice(0, 40),
+          title: (value.trim() || selectedFile?.name || "New Chat").slice(
+            0,
+            40,
+          ),
         }),
       );
     }
@@ -209,7 +216,7 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
             if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing)
               return;
             e.preventDefault();
-            if (value.trim()) e.currentTarget.form?.requestSubmit();
+            if (canSend) e.currentTarget.form?.requestSubmit();
           }}
           value={value}
           aria-label="Message Onyx"
@@ -244,19 +251,12 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
             />
             <Paperclip size={15} />
           </button>
-          <button
-            type="button"
-            aria-label="Voice"
-            className="flex size-9 cursor-pointer items-center justify-center gap-1.5 rounded-full bg-sf2 text-[13px] font-semibold text-mu transition-colors hover:text-ink sm:w-auto sm:px-3.5"
-          >
-            <Mic size={15} />
-            <span className="hidden sm:inline">Voice</span>
-          </button>
+
           <button
             type="submit"
             aria-label="Send"
             title="Send"
-            disabled={!value}
+            disabled={!canSend}
             className="ml-auto flex size-11 cursor-pointer sm:size-10 items-center justify-center rounded-full bg-ink text-bg transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:opacity-40"
           >
             <ArrowUp size={20} strokeWidth={2.5} />

@@ -1,6 +1,6 @@
 import { getModel } from "../config/llmModels.ts";
-import { AgentState } from "../graph/state";
-import { checkAgentLimit } from "../config/agentLimit";
+import type { AgentState } from "../graph/state.ts";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const codingAgent = async (state: AgentState) => {
   try {

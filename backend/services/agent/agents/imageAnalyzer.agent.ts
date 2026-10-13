@@ -1,8 +1,8 @@
 import fs from "fs/promises";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { getModel } from "../config/llmModels";
-import { AgentState } from "../graph/state";
-import { checkAgentLimit } from "../config/agentLimit";
+import { getModel } from "../config/llmModels.ts";
+import type { AgentState } from "../graph/state.ts";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const imageAnalyzerAgent = async (state: AgentState) => {
   try {

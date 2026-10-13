@@ -1,9 +1,9 @@
-import { getModel } from "../config/llmModels";
-import { AgentState } from "../graph/state";
+import { getModel } from "../config/llmModels.ts";
+import type { AgentState } from "../graph/state.ts";
 import axios from "axios";
-import { uploadToS3 } from "../utils/uploadToS3";
-import { getFromS3 } from "../utils/getFromS3";
-import { checkAgentLimit } from "../config/agentLimit";
+import { uploadToS3 } from "../utils/uploadToS3.ts";
+import { getFromS3 } from "../utils/getFromS3.ts";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const visionAgent = async (state: AgentState) => {
   try {

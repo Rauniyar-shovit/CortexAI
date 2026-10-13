@@ -1,5 +1,5 @@
 import { GetObjectCommand } from "@aws-sdk/client-s3";
-import { s3 } from "../config/s3";
+import { s3 } from "../config/s3.ts";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { cleanEnv, str } from "envalid";
 

@@ -1,7 +1,7 @@
 import type { Document } from "@langchain/core/documents";
 import { QdrantVectorStore } from "@langchain/qdrant";
 import { cleanEnv, str } from "envalid";
-import { embeddings } from "./embeddings";
+import { embeddings } from "./embeddings.ts";
 
 const env = cleanEnv(process.env, {
   QDRANT_URL: str(),

@@ -1,12 +1,12 @@
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { agentState } from "./state.ts";
-import { router } from "./router";
+import { router } from "./router.ts";
 import { chatAgent } from "../agents/chat.agent.ts";
-import { codingAgent } from "../agents/coding.agent";
+import { codingAgent } from "../agents/coding.agent.ts";
 import { visionAgent } from "../agents/vision.ts";
 import { pdfAgent } from "../agents/pdf.agent.ts";
 import { pptAgent } from "../agents/ppt.agent.ts";
-import { searchAgent } from "../agents/search.agent";
+import { searchAgent } from "../agents/search.agent.ts";
 import { pdfRagAgent } from "../agents/pdgRag.agent.ts";
 import { imageAnalyzerAgent } from "../agents/imageAnalyzer.agent.ts";
 

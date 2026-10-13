@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, CodeXml, Copy, Download, X } from "lucide-react";
+import { Check, CodeXml, Copy, X } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { closeArtifact } from "../redux/messageSlice";
 import type { RootState } from "../redux/store";

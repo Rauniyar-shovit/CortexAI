@@ -1,6 +1,6 @@
 import express from "express";
-import { agent } from "../controllers/agent.controller";
-import multer from "../config/multer";
+import { agent } from "../controllers/agent.controller.ts";
+import multer from "../config/multer.ts";
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
-import { searchTool } from "../config/tavily";
-import type { AgentState, SearchResponse } from "../graph/state";
-import { checkAgentLimit } from "../config/agentLimit";
+import { searchTool } from "../config/tavily.ts";
+import type { AgentState, SearchResponse } from "../graph/state.ts";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const searchAgent = async (state: AgentState): Promise<AgentState> => {
   try {

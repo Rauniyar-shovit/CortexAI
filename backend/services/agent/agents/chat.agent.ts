@@ -4,11 +4,11 @@ import {
   HumanMessage,
   SystemMessage,
 } from "@langchain/core/messages";
-import { getModel } from "../config/llmModels";
-import { getMemory } from "../config/memory";
-import { AgentState } from "../graph/state";
-import type { Message } from "../types/types";
-import { checkAgentLimit } from "../config/agentLimit";
+import { getModel } from "../config/llmModels.ts";
+import { getMemory } from "../config/memory.ts";
+import type { AgentState } from "../graph/state.ts";
+import type { Message } from "../types/types.ts";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const chatAgent = async (state: AgentState) => {
   try {

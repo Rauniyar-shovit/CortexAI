@@ -1,9 +1,9 @@
-import { getModel } from "../config/llmModels";
-import { AgentState } from "../graph/state";
-import { generatePpt, PptData } from "../utils/generatePpt";
-import { getFromS3 } from "../utils/getFromS3";
-import { uploadToS3 } from "../utils/uploadToS3";
-import { checkAgentLimit } from "../config/agentLimit";
+import { getModel } from "../config/llmModels.ts";
+import type { AgentState } from "../graph/state.ts";
+import { generatePpt, type PptData } from "../utils/generatePpt.ts";
+import { getFromS3 } from "../utils/getFromS3.ts";
+import { uploadToS3 } from "../utils/uploadToS3.ts";
+import { checkAgentLimit } from "../config/agentLimit.ts";
 
 export const pptAgent = async (state: AgentState) => {
   try {

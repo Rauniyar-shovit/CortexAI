@@ -5,12 +5,10 @@ import { useEffect, useState } from "react";
 import getConversations from "../features/getConversations";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addConversation,
   setConversations,
   setSelectedConversation,
   setSidebarOpen,
 } from "../redux/conversationSlice";
-import createConversation from "../features/createConversation";
 import type { RootState } from "../redux/store";
 import { setUserData } from "../redux/userSlice";
 import { signOut } from "firebase/auth";

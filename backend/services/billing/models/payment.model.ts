@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, model } from "mongoose";
+import mongoose, { type InferSchemaType, model } from "mongoose";
 
 // One document per payment: the first checkout or a renewal invoice.
 // A user's current plan is their latest paid payment.
