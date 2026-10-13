@@ -1,5 +1,5 @@
 import { cleanEnv, str } from "envalid";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import axios from "axios";
 import { graph } from "../graph/graph";
 import { router } from "../graph/router";
@@ -26,7 +26,11 @@ const AGENTS: RunnableAgent[] = [
 const isRunnableAgent = (name: string): name is RunnableAgent =>
   (AGENTS as string[]).includes(name);
 
-export const agent = async (req: Request, res: Response) => {
+export const agent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { prompt, conversationId, agent } = req.body;
     const userId = req.headers["x-user-id"];
@@ -62,6 +66,7 @@ export const agent = async (req: Request, res: Response) => {
     });
 
     const result = await graph.invoke({
+      userId,
       prompt,
       conversationId,
       agent: resolvedAgent,
@@ -96,6 +101,6 @@ export const agent = async (req: Request, res: Response) => {
       remainingCredits: credit.remainingCredits,
     });
   } catch (error) {
-    return res.status(500).json({ message: `agent error ${error}` });
+    next(error);
   }
 };

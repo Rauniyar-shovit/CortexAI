@@ -8,9 +8,11 @@ import { getModel } from "../config/llmModels";
 import { getMemory } from "../config/memory";
 import { AgentState } from "../graph/state";
 import type { Message } from "../types/types";
+import { checkAgentLimit } from "../config/agentLimit";
 
 export const chatAgent = async (state: AgentState) => {
   try {
+    await checkAgentLimit(state.userId, "chat");
     const llm = await getModel("chat");
 
     const history = await getMemory(state.conversationId);
@@ -68,9 +70,14 @@ export const chatAgent = async (state: AgentState) => {
       ...state,
       aiResponse: response.text,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Chat agent error:", error);
-
+    if (error.status === 429) {
+      return {
+        ...state,
+        aiResponse: error?.data.message,
+      };
+    }
     return {
       ...state,
       aiResponse:

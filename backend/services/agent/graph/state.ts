@@ -17,6 +17,7 @@ export type SearchResponse = TavilySearchResponseWithImageDescriptions;
 export type SearchImage = NonNullable<SearchResponse["images"]>[number];
 
 export const agentState = Annotation.Root({
+  userId: Annotation<string>(),
   prompt: Annotation<string>(),
   aiResponse: Annotation<string>(),
   agent: Annotation<AgentName>(),

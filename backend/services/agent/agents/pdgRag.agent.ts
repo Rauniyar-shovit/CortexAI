@@ -6,8 +6,11 @@ import fs from "fs";
 import { vectorStore } from "../config/vectorDb";
 import { getModel } from "../config/llmModels";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { checkAgentLimit } from "../config/agentLimit";
+
 export const pdfRagAgent = async (state: AgentState) => {
   try {
+    await checkAgentLimit(state.userId, "pdf");
     if (!state.file) return;
 
     const buffer = fs.readFileSync(state.file.path);

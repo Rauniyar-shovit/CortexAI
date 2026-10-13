@@ -1,10 +1,13 @@
 import { getModel } from "../config/llmModels.ts";
 import { AgentState } from "../graph/state";
+import { checkAgentLimit } from "../config/agentLimit";
 
 export const codingAgent = async (state: AgentState) => {
-  const intentLlm = await getModel("intent");
-  const llm = await getModel("coding");
-  const intentRes = await intentLlm.invoke(`You are an intent classifier.
+  try {
+    await checkAgentLimit(state.userId, "coding");
+    const intentLlm = await getModel("intent");
+    const llm = await getModel("coding");
+    const intentRes = await intentLlm.invoke(`You are an intent classifier.
 Return ONLY one of these values.
 CODE_GENERATION
 CODE_REVIEW
@@ -16,10 +19,10 @@ DOCUMENTATION
 User Request:
 ${state.prompt}`);
 
-  const intent = intentRes.text.trim();
+    const intent = intentRes.text.trim();
 
-  if (intent === "CODE_GENERATION") {
-    const prompt = `You are OnyxAI Coding Agent.
+    if (intent === "CODE_GENERATION") {
+      const prompt = `You are OnyxAI Coding Agent.
 Generate the requested project.
 Default stack:
 - HTML
@@ -78,40 +81,40 @@ User Request:
 ${state.prompt}
 `;
 
-    const res = await llm.invoke(prompt);
+      const res = await llm.invoke(prompt);
 
-    const raw = String(res.content)
-      .trim()
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```$/, "");
+      const raw = String(res.content)
+        .trim()
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/, "");
 
-    let data: { files?: { name: string; content: string }[] };
-    try {
-      data = JSON.parse(raw);
-    } catch {
+      let data: { files?: { name: string; content: string }[] };
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        return {
+          ...state,
+          aiResponse:
+            "Sorry, the coding model returned invalid output. Please try again.",
+          artifacts: [],
+        };
+      }
+
       return {
         ...state,
-        aiResponse:
-          "Sorry, the coding model returned invalid output. Please try again.",
-        artifacts: [],
+        aiResponse: "Code Generated Successfully",
+        artifacts: [
+          {
+            title: state.prompt,
+            id: Date.now(),
+            type: "Project",
+            files: data.files || [],
+          },
+        ],
       };
     }
 
-    return {
-      ...state,
-      aiResponse: "Code Generated Successfully",
-      artifacts: [
-        {
-          title: state.prompt,
-          id: Date.now(),
-          type: "Project",
-          files: data.files || [],
-        },
-      ],
-    };
-  }
-
-  const prompt = `
+    const prompt = `
     The user's request is 
 
     ${intent}
@@ -138,13 +141,21 @@ User Request:
 ${state.prompt}
 `;
 
-  const res = await llm.invoke(prompt);
+    const res = await llm.invoke(prompt);
 
-  const data = String(res.content);
+    const data = String(res.content);
 
-  return {
-    ...state,
-    aiResponse: data,
-    artifacts: [],
-  };
+    return {
+      ...state,
+      aiResponse: data,
+      artifacts: [],
+    };
+  } catch (error: any) {
+    if (error.status === 429) {
+      return {
+        ...state,
+        aiResponse: error?.data.message,
+      };
+    }
+  }
 };

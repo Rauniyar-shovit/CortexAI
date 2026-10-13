@@ -3,9 +3,11 @@ import { AgentState } from "../graph/state";
 import { generatePdf, PdfData } from "../utils/generatePdf";
 import { getFromS3 } from "../utils/getFromS3";
 import { uploadToS3 } from "../utils/uploadToS3";
+import { checkAgentLimit } from "../config/agentLimit";
 
 export const pdfAgent = async (state: AgentState) => {
   try {
+    await checkAgentLimit(state.userId, "pdfRag");
     const llm = await getModel("pdf");
 
     const prompt = `
@@ -71,7 +73,13 @@ ${state.prompt}
 Link expires in 10 minutes_
 `,
     };
-  } catch (error) {
+  } catch (error: any) {
+    if (error.status === 429) {
+      return {
+        ...state,
+        aiResponse: error?.data.message,
+      };
+    }
     console.error("PDF agent failed:", error);
     return {
       ...state,

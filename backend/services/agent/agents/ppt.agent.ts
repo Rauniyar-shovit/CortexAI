@@ -3,9 +3,11 @@ import { AgentState } from "../graph/state";
 import { generatePpt, PptData } from "../utils/generatePpt";
 import { getFromS3 } from "../utils/getFromS3";
 import { uploadToS3 } from "../utils/uploadToS3";
+import { checkAgentLimit } from "../config/agentLimit";
 
 export const pptAgent = async (state: AgentState) => {
   try {
+    await checkAgentLimit(state.userId, "ppt");
     const llm = await getModel("ppt");
     const prompt = `You are a professional presentation designer.
 
@@ -76,7 +78,14 @@ ${state.prompt}
 Link expires in 10 minutes
 `,
     };
-  } catch (error) {
+  } catch (error: any) {
+    if (error.status === 429) {
+      return {
+        ...state,
+        aiResponse: error?.data.message,
+      };
+    }
+
     console.error("PPT agent failed:", error);
     return {
       ...state,

@@ -3,9 +3,11 @@ import { AgentState } from "../graph/state";
 import axios from "axios";
 import { uploadToS3 } from "../utils/uploadToS3";
 import { getFromS3 } from "../utils/getFromS3";
+import { checkAgentLimit } from "../config/agentLimit";
 
 export const visionAgent = async (state: AgentState) => {
   try {
+    await checkAgentLimit(state.userId, "vision");
     const llm = await getModel("image");
 
     const res = await llm.invoke(`
@@ -52,9 +54,13 @@ ${state.prompt}
 ⏳ [Download Image](${downloadUrl})
 `,
     };
-  } catch (error) {
-    console.error("Vision agent error:", error);
-
+  } catch (error: any) {
+    if (error.status === 429) {
+      return {
+        ...state,
+        aiResponse: error?.data.message,
+      };
+    }
     return {
       ...state,
       aiResponse: "Sorry, I couldn't generate the image. Please try again.",

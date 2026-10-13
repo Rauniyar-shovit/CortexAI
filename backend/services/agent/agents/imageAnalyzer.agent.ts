@@ -2,18 +2,21 @@ import fs from "fs/promises";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { getModel } from "../config/llmModels";
 import { AgentState } from "../graph/state";
+import { checkAgentLimit } from "../config/agentLimit";
 
 export const imageAnalyzerAgent = async (state: AgentState) => {
-  const file = state.file;
   try {
-    if (!file) throw new Error("No image file provided");
+    await checkAgentLimit(state.userId, "imageAnalyzer");
+    const file = state.file;
+    try {
+      if (!file) throw new Error("No image file provided");
 
-    const llm = await getModel("imageAnalyzer");
+      const llm = await getModel("imageAnalyzer");
 
-    const imageBase64 = (await fs.readFile(file.path)).toString("base64");
+      const imageBase64 = (await fs.readFile(file.path)).toString("base64");
 
-    const message = [
-      new SystemMessage(`
+      const message = [
+        new SystemMessage(`
     You are OnyxAI ImageAnalyzer Agent.
 Rules:
 - Analyze only the uploaded image.
@@ -25,38 +28,46 @@ Rules:
 - Do not hallucinate.
     
     `),
-      new HumanMessage({
-        content: [
-          {
-            type: "text",
-            text: state.prompt || "analyze the image",
-          },
-          {
-            type: "image_url",
-            image_url: {
-              url: `data:${state.file?.mimetype};base64,${imageBase64}`,
+        new HumanMessage({
+          content: [
+            {
+              type: "text",
+              text: state.prompt || "analyze the image",
             },
-          },
-        ],
-      }),
-    ];
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:${state.file?.mimetype};base64,${imageBase64}`,
+              },
+            },
+          ],
+        }),
+      ];
 
-    const response = await llm.invoke(message);
-    console.log("🚀 ~ imageAnalyzerAgent ~ response:", response);
+      const response = await llm.invoke(message);
+      console.log("🚀 ~ imageAnalyzerAgent ~ response:", response);
 
-    return {
-      ...state,
-      aiResponse: response.content,
-    };
-  } catch (error) {
-    console.error("Image analyzer agent error:", error);
+      return {
+        ...state,
+        aiResponse: response.content,
+      };
+    } catch (error) {
+      console.error("Image analyzer agent error:", error);
 
-    return {
-      ...state,
-      aiResponse: "Sorry, I couldn't analyze the image. Please try again.",
-    };
-  } finally {
-    // Multer writes uploads to ./temp; remove the file once we're done with it
-    if (file) await fs.unlink(file.path).catch(() => {});
+      return {
+        ...state,
+        aiResponse: "Sorry, I couldn't analyze the image. Please try again.",
+      };
+    } finally {
+      // Multer writes uploads to ./temp; remove the file once we're done with it
+      if (file) await fs.unlink(file.path).catch(() => {});
+    }
+  } catch (error: any) {
+    if (error.status === 429) {
+      return {
+        ...state,
+        aiResponse: error?.data.message,
+      };
+    }
   }
 };
