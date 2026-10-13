@@ -450,6 +450,8 @@ const AGENT_COSTS = {
   pdf: 10,
   ppt: 10,
   vision: 10,
+  pdfRag: 10,
+  imageAnalyzer: 10,
 } as const;
 
 type Agent = keyof typeof AGENT_COSTS;

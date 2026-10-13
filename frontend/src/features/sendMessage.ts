@@ -1,12 +1,6 @@
-import type { AgentId, Artifact } from "../types/types";
+import type { Artifact } from "../types/types";
 import axios from "axios";
 import api from "../utils/axios";
-
-type Payload = {
-  prompt: string;
-  conversationId: string | undefined;
-  agent: AgentId;
-};
 
 export type AgentResponse = {
   answer: string;
@@ -22,7 +16,7 @@ export type NoCreditsResponse = {
 };
 
 const sendMessage = async (
-  payload: Payload,
+  payload: FormData,
 ): Promise<AgentResponse | NoCreditsResponse | null> => {
   try {
     const { data } = await api.post<AgentResponse>("/api/agent/chat", payload);

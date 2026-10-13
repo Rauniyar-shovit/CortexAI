@@ -25,7 +25,7 @@ const ArtifactCard = ({ artifact, active, onOpen }: ArtifactCardProps) => {
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.98 }}
       aria-pressed={active}
-      className={`flex w-full max-w-105 cursor-pointer items-center gap-3 rounded-[18px] bg-sf p-3 text-left whitespace-normal ring-2 transition-shadow ${
+      className={`flex w-full max-w-105 cursor-pointer items-center gap-3 rounded-[18px] bg-sf2 p-3 md:bg-sf text-left whitespace-normal ring-2 transition-shadow ${
         active ? "ring-ac" : "ring-transparent hover:ring-ln"
       }`}
     >
@@ -100,16 +100,19 @@ const MessageBubble = ({ role, content, images, artifacts }: Message) => {
 
   if (isUser) {
     return (
-      <div className="max-w-[70%] self-end rounded-[20px_20px_6px_20px] bg-ac px-4 py-3 text-[15px] wrap-break-word whitespace-pre-wrap text-aci">
+      <div className="max-w-[80%] self-end md:max-w-[70%] rounded-[20px_20px_6px_20px] bg-ac px-4 py-3 text-[15px] wrap-break-word whitespace-pre-wrap text-aci">
         {content}
       </div>
     );
   }
 
   return (
-    <div className="flex gap-3 pr-4 sm:pr-14 max-w-[95%]">
-      <Logo size={32} />
-      <div className="flex min-w-0 flex-1 flex-col gap-3 pt-1 text-[15px] leading-[1.6] wrap-break-word text-ink">
+    <div className="flex max-w-full gap-3 md:max-w-[95%] md:pr-14">
+      <div className="hidden shrink-0 md:block">
+        <Logo size={32} />
+      </div>
+      {/* Phones show the reply as a card bubble, desktop as plain text beside the logo */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3 rounded-[20px_20px_20px_6px] bg-sf p-3.5 text-[15px] leading-[1.6] wrap-break-word text-ink shadow-soft md:rounded-none md:bg-transparent md:p-0 md:pt-1 md:shadow-none">
         {images && images.length > 0 && (
           <div className="grid grid-cols-2 gap-2 whitespace-normal sm:grid-cols-3">
             {images.map((url, i) => (

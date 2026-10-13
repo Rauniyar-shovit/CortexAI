@@ -149,7 +149,7 @@ const BillingDrawer = ({ open, onClose }: BillingDrawerProps) => {
         role="dialog"
         aria-modal="true"
         aria-label="Billing"
-        className={`fixed inset-y-3.5 right-3.5 z-21 flex w-[360px] max-w-[calc(100vw-28px)] flex-col gap-3.5 overflow-y-auto rounded-[22px] bg-sb p-5 shadow-[0_20px_50px_rgba(30,20,60,0.18)] transition-transform duration-500 ease-[cubic-bezier(.3,.7,.2,1)] motion-reduce:transition-none ${
+        className={`fixed inset-y-3.5 right-3.5 z-21 flex w-[360px] max-w-[calc(100vw-28px)] flex-col gap-3.5 overflow-y-auto scrollbar-none [&::-webkit-scrollbar]:hidden rounded-[22px] bg-sb p-5 shadow-[0_20px_50px_rgba(30,20,60,0.18)] transition-transform duration-500 ease-[cubic-bezier(.3,.7,.2,1)] motion-reduce:transition-none ${
           open ? "translate-x-0" : "translate-x-[calc(100%+30px)]"
         }`}
       >

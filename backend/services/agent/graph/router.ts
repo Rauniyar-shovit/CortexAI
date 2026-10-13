@@ -10,6 +10,8 @@ export const router = async (state: AgentState) => {
     };
   }
 
+  console.log("file in router", state.file?.mimetype);
+
   if (state.file && state.file.mimetype === "application/pdf") {
     return {
       ...state,
@@ -80,6 +82,7 @@ coding
 pdf
 ppt
 vision
+
 
 User Query:
 ${state.prompt}

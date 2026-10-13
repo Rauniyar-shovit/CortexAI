@@ -19,6 +19,8 @@ const AGENTS: RunnableAgent[] = [
   "pdf",
   "ppt",
   "vision",
+  "pdfRag",
+  "imageAnalyzer",
 ];
 
 const isRunnableAgent = (name: string): name is RunnableAgent =>
@@ -29,7 +31,7 @@ export const agent = async (req: Request, res: Response) => {
     const { prompt, conversationId, agent } = req.body;
     const userId = req.headers["x-user-id"];
     const file = req.file;
-
+    console.log(file);
     if (typeof userId !== "string") {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -37,7 +39,7 @@ export const agent = async (req: Request, res: Response) => {
     // Pick the agent up front (the router skips its LLM call when one is
     // given) so we know what to charge; unknown answers fall back to chat
     const routed = (
-      await router({ prompt, agent } as Parameters<typeof router>[0])
+      await router({ prompt, agent, file } as Parameters<typeof router>[0])
     ).agent;
     const resolvedAgent = isRunnableAgent(routed) ? routed : "chat";
 

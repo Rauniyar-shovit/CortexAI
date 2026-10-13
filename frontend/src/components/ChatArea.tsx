@@ -6,7 +6,12 @@ import type { RootState } from "../redux/store";
 import { useEffect } from "react";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import getMessages from "../features/getMessages";
-import { setArtifacts, setMessages } from "../redux/messageSlice";
+import {
+  closeArtifact,
+  setArtifacts,
+  setMessages,
+} from "../redux/messageSlice";
+import { isWideScreen } from "../utils";
 import Artifact from "./Artifact";
 
 const ChatArea = () => {
@@ -30,6 +35,7 @@ const ChatArea = () => {
         .find((msg) => msg.artifacts && msg.artifacts.length > 0);
 
       dispatch(setArtifacts(lastestArtifactMsg?.artifacts || []));
+      if (!isWideScreen()) dispatch(closeArtifact());
     };
 
     // No conversation selected (New chat) — drop the previous chat's messages so
@@ -51,7 +57,7 @@ const ChatArea = () => {
       {/* Chat column takes whatever width the artifact panel leaves */}
       <div
         className={`flex min-h-0 min-w-0 flex-1 flex-col gap-3.5 pt-1.5 pb-4 ${
-          showArtifact ? "px-1" : "px-4 sm:px-10"
+          showArtifact ? "px-3.5 lg:px-1" : "px-3.5 sm:px-10"
         }`}
       >
         <ChatNavbar />
@@ -84,6 +90,22 @@ const ChatArea = () => {
               >
                 <Artifact />
               </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Below lg there's no room beside the chat, so the artifact opens as a full-screen sheet */}
+        <AnimatePresence>
+          {showArtifact && (
+            <motion.div
+              key="artifact-sheet"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 260, damping: 32 }}
+              className="fixed inset-0 z-30 flex bg-bg p-2.5 lg:hidden"
+            >
+              <Artifact />
             </motion.div>
           )}
         </AnimatePresence>

@@ -2,23 +2,24 @@ import NewConversationText from "./WelcomeScreen";
 import type { RootState } from "../redux/store";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
-
-const FollowUps = ({ items }: { items: string[] }) => (
-  <div className="flex flex-wrap gap-2">
-    {items.map((item) => (
-      <button
-        key={item}
-        type="button"
-        className="cursor-pointer rounded-full bg-sf px-3 py-1.75 text-[13px] font-semibold text-ink transition-colors hover:bg-sf2"
-      >
-        {item}
-      </button>
-    ))}
-  </div>
-);
+import LoadingAnimation from "./LoadingAnimation";
+import { useEffect, useRef } from "react";
 
 const MessageList = () => {
-  const { messages } = useSelector((state: RootState) => state?.message);
+  const { messages, isLoading } = useSelector(
+    (state: RootState) => state?.message,
+  );
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      bottomRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    });
+  }, [messages?.length, isLoading]);
 
   const { selectedConversation } = useSelector(
     (state: RootState) => state?.conversation,
@@ -38,8 +39,10 @@ const MessageList = () => {
               artifacts={message.artifacts}
             />
           ))}
+          {isLoading && <LoadingAnimation />}
         </div>
       )}
+      <div ref={bottomRef} />
     </div>
   );
 };

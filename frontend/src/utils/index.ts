@@ -13,3 +13,8 @@ export const detectLanguage = (fileName = "") => {
   if (name.endsWith(".c")) return "c";
   return "plaintext";
 };
+
+// Matches Tailwind's lg breakpoint, where the artifact panel fits beside the chat.
+// Below it the panel is a full-screen sheet, so it only opens when the user taps a card.
+export const isWideScreen = () =>
+  window.matchMedia("(min-width: 1024px)").matches;

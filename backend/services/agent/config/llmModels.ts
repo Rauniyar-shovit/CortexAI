@@ -15,7 +15,7 @@ const groq = new ChatGroq({
 });
 
 const gemini = new ChatGoogleGenerativeAI({
-  model: "gemini-2.5-pro",
+  model: "gemini-3.8-flash",
   apiKey: env.GOOGLE_API_KEY,
 });
 

@@ -4,10 +4,13 @@ import type { Conversation } from "../types/types";
 type ConversationState = {
   conversations: Conversation[] | null;
   selectedConversation: Conversation | null;
+  // Mobile sidebar drawer; the desktop sidebar is always on screen
+  isSidebarOpen: boolean;
 };
 const initialState: ConversationState = {
   conversations: [],
   selectedConversation: null,
+  isSidebarOpen: false,
 };
 
 const conversationSlice = createSlice({
@@ -28,6 +31,10 @@ const conversationSlice = createSlice({
       action: PayloadAction<Conversation | null>,
     ) => {
       state.selectedConversation = action.payload;
+    },
+
+    setSidebarOpen: (state, action: PayloadAction<boolean>) => {
+      state.isSidebarOpen = action.payload;
     },
 
     setConvTitle: (
@@ -54,5 +61,6 @@ export const {
   addConversation,
   setConvTitle,
   setSelectedConversation,
+  setSidebarOpen,
 } = conversationSlice.actions;
 export default conversationSlice.reducer;

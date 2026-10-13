@@ -5,7 +5,6 @@ import { AgentState } from "../graph/state";
 
 export const imageAnalyzerAgent = async (state: AgentState) => {
   const file = state.file;
-
   try {
     if (!file) throw new Error("No image file provided");
 
@@ -33,7 +32,7 @@ Rules:
             text: state.prompt || "analyze the image",
           },
           {
-            type: "imag_url",
+            type: "image_url",
             image_url: {
               url: `data:${state.file?.mimetype};base64,${imageBase64}`,
             },
@@ -43,6 +42,7 @@ Rules:
     ];
 
     const response = await llm.invoke(message);
+    console.log("🚀 ~ imageAnalyzerAgent ~ response:", response);
 
     return {
       ...state,

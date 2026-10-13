@@ -143,3 +143,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 serviceAccountKey.json
+
+# Agent service uploads (PDFs and images saved by multer)
+backend/services/agent/temp/
