@@ -36,7 +36,6 @@ const ChatInput = ({ placeholder = "Ask Onyx anything…" }: ChatInputProps) => 
   const { isLoading } = useSelector((state: RootState) => state?.message);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  console.log(selectedFile);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const [selectedAgent, setSelectedAgent] = useState<AgentId>("auto");
