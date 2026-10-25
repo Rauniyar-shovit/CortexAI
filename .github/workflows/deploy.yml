@@ -69,7 +69,7 @@ jobs:
 
       - name: tag Chat
         run: |
-          docker tag auth:latest \
+          docker tag chat:latest \
           $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chat:latest
 
       - name: push chat
@@ -167,7 +167,7 @@ jobs:
         run: |
           aws s3 sync \
           frontend/dist \
-          s3://$${{secrets.S3_BUCKET}} \
+          s3://${{secrets.S3_BUCKET}} \
           --delete
 
       - name: invalidate cloudfront
