@@ -1,4 +1,4 @@
-# CortexAI
+# OnyxAI
 
 A multi-agent AI assistant. You chat with it, and a router decides which specialised agent should answer: general chat, web search, coding, image generation, PDF or PowerPoint generation, or questions about an uploaded PDF or image. Usage is metered with credits, and paid plans are handled through Stripe.
 
