@@ -111,35 +111,35 @@ jobs:
       - name: deploy gateway
         run: |
           aws ecs update-service \
-          --cluster $${{secrets.ECS_CLUSTER}} \
+          --cluster ${{secrets.ECS_CLUSTER}} \
           --service ${{secrets.GATEWAY_SERVICE}} \
           --force-new-deployment
 
       - name: deploy auth
         run: |
           aws ecs update-service \
-          --cluster $${{secrets.ECS_CLUSTER}} \
+          --cluster ${{secrets.ECS_CLUSTER}} \
           --service ${{secrets.AUTH_SERVICE}} \
           --force-new-deployment
 
       - name: deploy chat
         run: |
           aws ecs update-service \
-          --cluster $${{secrets.ECS_CLUSTER}} \
+          --cluster ${{secrets.ECS_CLUSTER}} \
           --service ${{secrets.CHAT_SERVICE}} \
           --force-new-deployment
 
       - name: deploy agent
         run: |
           aws ecs update-service \
-          --cluster $${{secrets.ECS_CLUSTER}} \
+          --cluster ${{secrets.ECS_CLUSTER}} \
           --service ${{secrets.AGENT_SERVICE}} \
           --force-new-deployment
 
       - name: deploy billing
         run: |
           aws ecs update-service \
-          --cluster $${{secrets.ECS_CLUSTER}} \
+          --cluster ${{secrets.ECS_CLUSTER}} \
           --service ${{secrets.BILLING_SERVICE}} \
           --force-new-deployment
 
