@@ -38,8 +38,8 @@ export const login = async (req: Request, res: Response) => {
 
     res.cookie("session", sessionId, {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: sessionTtl * 1000,
     });
 

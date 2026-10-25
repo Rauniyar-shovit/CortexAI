@@ -1,11 +1,4 @@
-import {
-  ArrowUp,
-  FileText,
-  ImageIcon,
-  Mic,
-  Paperclip,
-  XIcon,
-} from "lucide-react";
+import { ArrowUp, FileText, ImageIcon, Paperclip, XIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
