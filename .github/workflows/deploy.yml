@@ -44,6 +44,13 @@ jobs:
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/gateway:latest
 
       # build auth service
+      # serviceAccountKey.json is gitignored, so recreate it from the secret before building
+      - name: Add Firebase service account key
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > backend/services/auth/serviceAccountKey.json
+
       - name: Build Auth
         run: |
           docker build \
