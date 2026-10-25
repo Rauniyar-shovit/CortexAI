@@ -144,6 +144,7 @@ jobs:
           --force-new-deployment
 
   deploy-frontend:
+    needs: deploy-backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -167,7 +168,7 @@ jobs:
           aws s3 sync \
           frontend/dist \
           s3://$${{secrets.S3_BUCKET}} \
-          -- delete
+          --delete
 
       - name: invalidate cloudfront
         run: |
