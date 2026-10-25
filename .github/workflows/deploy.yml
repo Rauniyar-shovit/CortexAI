@@ -41,8 +41,7 @@ jobs:
 
       - name: push gateway
         run: |
-          docker push \  
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/gateway:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/gateway:latest
 
       # build auth service
       - name: Build Auth
@@ -58,8 +57,7 @@ jobs:
 
       - name: push auth
         run: |
-          docker push \  
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/auth:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/auth:latest
 
         # build chat
 
@@ -76,8 +74,7 @@ jobs:
 
       - name: push chat
         run: |
-          docker push \  
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chat:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/chat:latest
 
       # build agent
       - name: Build Agent
@@ -93,8 +90,7 @@ jobs:
 
       - name: push agent
         run: |
-          docker push \  
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/agent:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/agent:latest
 
       # build billing
       - name: Build billing
@@ -110,8 +106,7 @@ jobs:
 
       - name: push billing
         run: |
-          docker push \  
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/billing:latest
+          docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/billing:latest
 
       - name: deploy gateway
         run: |
